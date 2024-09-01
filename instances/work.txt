@@ -1,0 +1,17 @@
+/# ls 
+/test/# cd test
+/test/# ls 
+/test/# touch file1.file
+/test/# ls 
+/test/# rm .
+/test/# rm file1.file
+/test/# ls 
+/test/# C:/Users/donat/AppData/Local/Programs/Python/Python311/python.exe c:/Users/donat/OneDrive/Documents/programation/python/unixpy/test.py
+/test/# exit 
+/# ls 
+/# ls 
+/test/# cd test
+/test/# ls 
+/test/# touch file.txt
+/test/# ls 
+/test/#  

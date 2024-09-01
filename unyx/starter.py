@@ -5,26 +5,26 @@ from tkinter import filedialog
 from tkinter import ttk
 import pickle
 import os
-from .unixsys import Directory
-
+from .unixsys import Root
 def select_instance():
     system = None
     root = tk.Tk()
     root.title('Unyx Starter')
     root.geometry('400x400')
     root.resizable(False, False)
-    instanceslist = [file for file in os.listdir('instances') if file.endswith('.unyx')]
-    map(lambda x: x.split('.')[0], instanceslist)
+    liste = os.listdir('instances')
+
+    instanceslist = [file.split(".")[:-1] for file in liste if file.endswith('.unyx')]
     instances = ttk.Combobox(root, values=instanceslist)
     instances.pack()
     instances.set('Select Instance')
     def new_instance():
         name = simpledialog.askstring('New Instance', 'Enter a name for the new instance')
         if name:
-            system = {'/':Directory('root')}
+            system = Root()
             with open(os.path.join('instances', name+'.unyx'),'wb') as f:
                 pickle.dump(system, f)
-            instanceslist.append(name.split('.')[0])
+            instanceslist.append(name)
             instances['values'] = instanceslist
             instances.set(name)
     def start():
