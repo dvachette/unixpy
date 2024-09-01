@@ -1,8 +1,10 @@
+
+import unittest
 class File:
     def __init__(self, parent, name):
         self.name = name
         self.parent = parent
-        self.data = None
+        self.data = list()
         if isinstance(parent, Root):
             self.root = self.parent
         else:
@@ -40,7 +42,8 @@ class File:
 class Root:
     def __init__(self):
         self.child = list()
-
+        self.vars = dict()
+        self.root = self
     def __len__(self):
         return len(self.child)
 
@@ -50,6 +53,17 @@ class Root:
     def __iter__(self):
         return iter(self.child)
     
+    def add_var(self, name, value):
+        self.vars[name] = value
+
+    def get_var(self, name):
+        return self.vars.get(name, None)
+    
+    def remove_var(self, name):
+        return self.vars.pop(name, None)
+    
+
+
     def find(self, path):
         if "/" in path:
             name, tail = path.split("/",1)
@@ -114,15 +128,53 @@ class Directory:
             return self
         if path == "..":
             return self.parent
-        elif name.endswith("*"):
+        elif path.endswith("*"):
                 for item in self:
-                    if item.name.startswith(name[:-1]):
-                        return item.find(tail)
+                    if item.name.startswith(path[:-1]):
+                        return item
         for item in self:
             if item.name == path:
                 return item
-    
+        return "No such file or directory"
     def __repr__(self):
         return f'Directory({self.parent}, {self.name})'
 
 
+class TestFileSystem(unittest.TestCase):
+
+    def setUp(self):
+        self.root = Root()
+        self.dir1 = Directory(self.root, "dir1")
+        self.dir2 = Directory(self.dir1, "dir2")
+        self.file1 = File(self.dir1, "file1")
+        self.file2 = File(self.dir2, "file2")
+        self.file1.data = "Hello"
+        self.file2.data = "World"
+
+    def test_initialization(self):
+        self.assertEqual(self.root.child, [self.dir1])
+        self.assertEqual(self.dir1.child, [self.dir2, self.file1])
+        self.assertEqual(self.dir2.child, [self.file2])
+        self.assertEqual(self.file1.name, "file1")
+        self.assertEqual(self.file2.name, "file2")
+
+    def test_repr_str(self):
+        self.assertEqual(repr(self.file1), 'File(Directory(root, dir1),file1)')
+        self.assertEqual(str(self.file1), 'file1')
+        self.assertEqual(repr(self.dir1), 'Directory(root, dir1)')
+
+    def test_path_property(self):
+        self.assertEqual(self.file1.path, '/dir1/file1')
+        self.assertEqual(self.dir2.path, '/dir1/dir2/')
+
+    def test_find_method(self):
+        self.assertEqual(self.root.find('dir1/dir2/file2'), self.file2)
+        self.assertEqual(self.dir1.find('dir2/file2'), self.file2)
+        self.assertEqual(self.dir1.find('..'), self.root)
+        self.assertEqual(self.dir2.find('.'), self.dir2)
+        self.assertEqual(self.root.find('dir1/.'), self.dir1)
+        self.assertEqual(self.dir1.find('file*'), self.file1)
+        self.assertEqual(self.root.find('dir1/dir2/file3'), "No such file or directory")
+
+if __name__ == '__main__':
+    unittest.main()

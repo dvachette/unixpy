@@ -2,7 +2,7 @@ from .unixsys import Directory, File, Root
 import pickle
 import re
 from . import man
-
+from .open import open_ 
 
 class Shell:
     def __init__(self, system:str):
@@ -11,16 +11,18 @@ class Shell:
             self.system:Root = pickle.load(f)
         self.current = self.system
         self.root = self.system
-        self.log_file = self.system_path.split(".")[0]+".txt"
+        self.log_file = self.system_path+".history"
 
 
     def run(self):
         running = True
         while running:
             try:
-                command, *args = input(f'{self.current.path}# ').split(' ')
+                command, *args = input(f'{self.current.path} # ').split(' ')
             except EOFError:
                 break
+            except KeyboardInterrupt:
+                display("use 'exit' or <ctrl+z> to quit")
             match command:
                 case 'exit':
                     running = False
@@ -39,12 +41,20 @@ class Shell:
                     self.current = self.current.find(args[0])
                 
                 case "mkdir":
+                    for item in self.current:
+                        if item.name == args[0]:
+                            display('Directory already exists')
+                            break
                     valid_regex = r'^[^/\\:*?"<>|]+$'
                     if re.match( valid_regex, args[0]):
                         Directory(self.current, args[0])
                     else:
                         display('Invalid directory name')
                 case "touch":
+                    for item in self.current:
+                        if item.name == args[0]:
+                            display('File already exists')
+                            break
                     valid_regex = r'^[^/\\:*?"<>|]+$'
                     if re.match(valid_regex,args[0]):
                         File(self.current, args[0])
@@ -72,6 +82,25 @@ class Shell:
                     
                     doc = getattr(man, f'help_{req}')
                     display(doc())
+                case "open":
+                    display(open_(command, ))
+                case "var":
+                    if args:
+                        if args[0] == "list":
+                            display("\n".join(self.current.root.vars.keys()))
+                        elif len(args) >= 2:
+                            match args[0]:
+                                case "set":
+                                    self.current.root.vars[args[1]] = " ".join(args[2:])
+                                case "get":
+                                    display(self.current.root.get_var(args[1]))
+                                case "del":
+                                    self.current.root.remove_var(args[1])
+                case "":
+                    pass
+                case _:
+                    display('Unknow command','Use "help" to see all available commands', sep="\n")
+
             with open(self.system_path, 'wb') as f:
                 pickle.dump(self.system, f)
             with open(self.log_file, 'a') as f:

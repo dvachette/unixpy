@@ -1,6 +1,6 @@
 def help_ls():
     return """
-    ls <path>
+    ls [path]
     
     List the contents of the current directory or the directory at the specified path.
     """
