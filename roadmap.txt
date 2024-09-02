@@ -2,3 +2,6 @@ shell : first version
     files, directories
     save instances
     move, create new, delete, rename, copy, store text
+
+
+add a is_inherited for files and directories
