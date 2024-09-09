@@ -39,6 +39,7 @@ class Shell:
                 break
             except KeyboardInterrupt:
                 display("use 'exit' or <ctrl+z> to quit")
+            command = command.lower()
             command = self.allias(command)
             args = [arg for arg in args if arg != '']
             match command:
