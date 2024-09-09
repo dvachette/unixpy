@@ -1,3 +1,5 @@
-# from unyx import select_instance
+from unyx import starter
 from unyx import shell
-shell.Shell("instances/instance.unyx").run()
+
+path = starter.start()
+shell.Shell(path).run()

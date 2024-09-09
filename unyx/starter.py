@@ -1,54 +1,56 @@
-import tkinter as tk
-from tkinter import messagebox
-from tkinter import simpledialog
-from tkinter import filedialog
-from tkinter import ttk
-import pickle
 import os
 from .unixsys import Root
-def select_instance():
-    system = None
-    root = tk.Tk()
-    root.title('Unyx Starter')
-    root.geometry('400x400')
-    root.resizable(False, False)
-    liste = os.listdir('instances')
+import pickle
+import sys
 
-    instanceslist = [file.split(".")[:-1] for file in liste if file.endswith('.unyx')]
-    instances = ttk.Combobox(root, values=instanceslist)
-    instances.pack()
-    instances.set('Select Instance')
-    def new_instance():
-        name = simpledialog.askstring('New Instance', 'Enter a name for the new instance')
-        if name:
-            system = Root()
-            with open(os.path.join('instances', name+'.unyx'),'wb') as f:
-                pickle.dump(system, f)
-            instanceslist.append(name)
-            instances['values'] = instanceslist
-            instances.set(name)
-    def start():
-        nonlocal system
-        if instances.get() == 'Select Instance':
-            messagebox.showinfo('Error', 'Please select an instance')
+
+def chose_instance():
+    instances = [
+        filename
+        for filename in os.listdir('instances')
+        if filename.endswith('.unyx')
+    ]
+    print('Choose an instance:')
+    for i, instance in enumerate(instances):
+        print(f'{i+1}. {instance}')
+    while True:
+        choice = input('Enter the number of the instance you want to use: ')
+        if choice.isdigit() and 0 < int(choice) <= len(instances):
+            return instances[int(choice)-1]
         else:
-            system = os.path.join('instances', instances.get()+'.unyx')
-            root.destroy()
-    def delete_instance():
-        name = instances.get()
-        if name == 'Select Instance':
-            messagebox.showinfo('Error', 'Please select an instance')
+            print('Invalid input')
+
+
+def create_instance():
+    instance = Root()
+    name = input('Enter the name of the instance: ')
+    try:
+        with open(path := f'instances/{name}.unyx', 'wb') as f:
+            pickle.dump(instance, f)
+    except OSError:
+        print('Invalid name')
+        return create_instance()
+    except EOFError:
+        sys.exit()
+    return path
+
+def delete_instance():
+    instance = chose_instance()
+    os.remove(f'instances/{instance}')
+    print(f'{instance} has been deleted')
+
+def start():
+    print('1. Create a new instance')
+    print('2. Use an existing instance')
+    print('3. Delete an instance')
+    choice = str()
+    while choice not in ['1', '2', '3']:
+        choice = input('Enter the number of the option you want to use: ')
+        if choice == '1':
+            return create_instance()
+        elif choice == '2':
+            return f'instances/{chose_instance()}'
+        elif choice == '3':
+            delete_instance()
         else:
-            if messagebox.askokcancel('Delete Instance', f'Are you sure you want to delete {name}?'):
-                os.remove(os.path.join('instances', name+'.unyx'))
-                instanceslist.remove(name)
-                instances['values'] = instanceslist
-                instances.set('Select Instance')
-    deletebutton = tk.Button(root, text='Delete Instance', command=delete_instance)
-    deletebutton.pack()
-    newbutton = tk.Button(root, text='New Instance', command=new_instance)
-    newbutton.pack()
-    startbutton = tk.Button(root, text='Start', command=start)
-    startbutton.pack()
-    root.mainloop()
-    return system
+            print('Invalid input')
