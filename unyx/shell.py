@@ -14,6 +14,21 @@ class Shell:
         self.root = self.system
         self.log_file = self.system_path + '.history'
         display(f'Welcome to Unyx - {self.system_path}')
+        self.alliasses = {
+            'ls': ['list','ls','dir'],
+            'cd': ['chdir','cd'],
+            'mkdir': ['md','mkdir'],
+            'touch': ['new','touch'],
+            'rm': ['delete','rm','del','remove'],
+            'exit': ['quit','exit'],
+            'help': ['?', 'help'],
+            'open': ['open'],
+            'cp': ['copy','cp'],
+            'mv': ['move','mv'],
+            'rename': ['ren','rn','rename'],
+            'var': ['var'],
+        }
+
 
     def run(self):
         running = True
@@ -24,11 +39,17 @@ class Shell:
                 break
             except KeyboardInterrupt:
                 display("use 'exit' or <ctrl+z> to quit")
+            command = self.allias(command)
+            args = [arg for arg in args if arg != '']
             match command:
                 case 'exit':
                     running = False
                 case 'ls':
                     target = self.current
+                    flag = False
+                    if args and args[0] == '-a':
+                        flag = True
+                        args.pop(0)
                     if args:
                         paths_regex = (
                             r'(^/|^\.{1,2}/|^[^/])([^/\0]+/)*([^/\0]+)?'
@@ -37,48 +58,71 @@ class Shell:
                             target = self.current.find(args[0])
                     for item in target:
                         if isinstance(item, Directory):
-                            display(f'{item.name}/')
+                            if item.name.startswith('.'):
+                                if flag:
+                                    display(f'{item.name}/')
+                            else:
+                                display(f'{item.name}/')
                         else:
-                            display(item.name)
+                            if item.name.startswith('.'):
+                                if flag:
+                                    display(item.name)
+                            else:
+                                display(item.name)
                 case 'cd':
                     self.current = self.current.find(args[0])
 
                 case 'mkdir':
+                    flag = True
                     for item in self.current:
                         if item.name == args[0]:
                             display('Directory already exists')
-                            break
-                    valid_regex = r'^[^/\\:*?"<>|]+$'
+                            flag = False
+                    valid_regex = r'^[^/\\:*?"<>|\s]+$'
                     if re.match(valid_regex, args[0]):
-                        Directory(self.current, args[0])
+                        if not all([char == '.' for char in args[0]]) and flag:
+                            Directory(self.current, args[0])
+                        else:
+                            display('Invalid directory name')
                     else:
                         display('Invalid directory name')
                 case 'touch':
+                    exists = False
                     for item in self.current:
                         if item.name == args[0]:
                             display('File already exists')
-                            break
+                            exists = True
                     valid_regex = r'^[^/\\:*?"<>|]+$'
-                    if re.match(valid_regex, args[0]):
+                    if re.match(valid_regex, args[0]) and not exists:
                         File(self.current, args[0])
+                    elif exists:
+                        display('File already exists')
                     else:
                         display('Invalid file name')
                 case 'rm':
+                    flag = False
+                    if args and args[0].lower() in ['-f','-force']:
+                        flag = True
+                        args.pop(0)
                     target = self.current.find(args[0])
                     if target == self.current:
                         display('Cannot delete current directory')
                     elif target == 'No such file or directory':
                         display(target)
                     else:
-                        if isinstance(target, Directory) and len(target) > 0:
-                            if len(args) >= 2 and args[1].lower() == '-f':
-                                self.current.child.remove(target)
+                        if isinstance(target, Directory) and len(target):
+                            if self.current.descend_from(target):
+                                display('Cannot delete current or parent directory')
                             else:
-                                display(
-                                    'Directory not empty, use -f to force delete'
-                                )
+                                if flag:
+                                    self.current.child.remove(target)
+                                else:
+                                    display(
+                                        'Directory not empty, use rm -f <directory> to force delete'
+                                    )
                         else:
                             self.current.child.remove(target)
+                
                 case 'help':
                     if args:
                         req = args[0]
@@ -110,8 +154,32 @@ class Shell:
                                     self.current.root.remove_var(args[1])
 
                 case 'mv':
+                    ok = True
                     target = self.current.find(args[0])
-                    target.move(self.current.find(args[1]))
+                    dest = self.current.find(args[1])
+                    if target == 'No such file or directory':
+                        display('Source not found')
+                        ok = False
+                    if dest == 'No such file or directory':
+                        display('Destination not found')
+                        ok = False
+                    for item in dest.child:
+                        if item.name == target.name:
+                            display('File already exists')
+                            ok = False
+                    if ok:
+                        target.move(dest)
+
+                case 'cp':
+                    target = self.current.find(args[0])
+                    if '/' in args[1]:
+                        dest, name = args[1].rsplit('/', 1)
+                    else:
+                        dest, name = '.', args[1]
+                    
+                    copy = target.copy()
+                    copy.rename(name)
+                    copy.move(self.current.find(dest))
 
                 case '':
                     pass
@@ -130,6 +198,10 @@ class Shell:
                 pickle.dump(self.system, f)
             with open(self.log_file, 'a') as f:
                 f.write(f'{self.current.path}# {command} {" ".join(args)}\n')
-
+    def allias(self,value):
+        for command, alliasses in self.alliasses.items():
+            if value in alliasses:
+                return command
+        return value
 
 display = print

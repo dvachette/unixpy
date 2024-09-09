@@ -36,6 +36,11 @@ class File:
     def __contains__(self, item):
         return item in self.data
 
+    def copy(self):
+        new = File(self.parent, self.name)
+        new.data = self.data.copy()
+        return new
+
     @property
     def path(self):
         return self.parent.path + self.name
@@ -96,6 +101,8 @@ class Root:
     def remove_var(self, name):
         return self.vars.pop(name, None)
 
+    def descend_from(self, item):
+        return item == self
     def find(self, path):
         if '/' in path:
             name, tail = path.split('/', 1)
@@ -139,12 +146,27 @@ class Directory:
             self.root: Root = self.parent.root
         self.name = name
         self.parent.child.append(self)
+    
 
     def __len__(self):
         return len(self.child)
 
     def __iter__(self):
         return iter(self.child)
+
+
+    def __contains__(self, value):
+        names = [item.name for item in self.child]
+        return value.name in names
+
+
+    def descend_from(self, item):
+        if item == self:
+            return True
+        if item == self.root:
+            return True
+        return self.descend_from(item.parent)
+        
 
     @property
     def path(self):
@@ -195,8 +217,8 @@ class TestFileSystem(unittest.TestCase):
         self.dir2 = Directory(self.dir1, 'dir2')
         self.file1 = File(self.dir1, 'file1')
         self.file2 = File(self.dir2, 'file2')
-        self.file1.data = 'Hello'
-        self.file2.data = 'World'
+        self.file1.data = ['Hello']
+        self.file2.data = ['World']
 
     def test_initialization(self):
         self.assertEqual(self.root.child, [self.dir1])
@@ -224,6 +246,16 @@ class TestFileSystem(unittest.TestCase):
         self.assertEqual(
             self.root.find('dir1/dir2/file3'), 'No such file or directory'
         )
+
+    def test_read_method(self):
+        self.assertEqual(self.file1.read(), ['Hello'])
+        self.assertEqual(self.file1.read(1), [])
+        self.assertEqual(self.file1.read(0, 1), ['Hello'])
+        self.assertEqual(self.file1.read(0, 0), [])
+
+    def test_contains_method(self):
+        self.assertTrue(self.file1 in self.dir1)
+        self.assertFalse(self.file2 in self.dir1)
 
 
 if __name__ == '__main__':
