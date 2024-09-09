@@ -206,3 +206,4 @@ class Shell:
         return value
 
 display = print
+
