@@ -42,7 +42,19 @@ class Shell:
             command = command.lower()
             command = self.allias(command)
             args = [arg for arg in args if arg != '']
-            match command:
+            self.execute(command,*args)
+
+            with open(self.system_path, 'wb') as f:
+                pickle.dump(self.system, f)
+            with open(self.log_file, 'a') as f:
+                f.write(f'{self.current.path}# {command} {" ".join(args)}\n')
+    def allias(self,value):
+        for command, alliasses in self.alliasses.items():
+            if value in alliasses:
+                return command
+        return value
+    def execute(self, command, *args):
+        match command:
                 case 'exit':
                     running = False
                 case 'ls':
@@ -194,16 +206,5 @@ class Shell:
                         'Use "help" to see all available commands',
                         sep='\n',
                     )
-
-            with open(self.system_path, 'wb') as f:
-                pickle.dump(self.system, f)
-            with open(self.log_file, 'a') as f:
-                f.write(f'{self.current.path}# {command} {" ".join(args)}\n')
-    def allias(self,value):
-        for command, alliasses in self.alliasses.items():
-            if value in alliasses:
-                return command
-        return value
-
 display = print
 
