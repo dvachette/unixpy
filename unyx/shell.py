@@ -41,9 +41,13 @@ class Shell:
                 self.output("use 'exit' or <ctrl+z> to quit")
             command = command.lower()
             command = self.allias(command)
+            filename_output = None
             args = [arg for arg in args if arg != '']
+            if args and args[-2] == '>':
+                filename_output = args[-1]
+                args = args[:-2]
             ans = self.execute(command,*args)
-            self.output(ans)
+            self.output(ans, filename_output)
             with open(self.system_path, 'wb') as f:
                 pickle.dump(self.system, f)
             with open(self.log_file, 'a') as f:
