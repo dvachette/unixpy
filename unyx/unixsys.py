@@ -96,13 +96,14 @@ class Root:
         self.vars[name] = value
 
     def get_var(self, name):
-        return self.vars.get(name, None)
+        return self.vars.get(name, "Variable not found")
 
     def remove_var(self, name):
-        return self.vars.pop(name, None)
+        return self.vars.pop(name, "Variable not found")
 
     def descend_from(self, item):
         return item == self
+    
     def find(self, path):
         if '/' in path:
             name, tail = path.split('/', 1)

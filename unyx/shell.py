@@ -13,7 +13,7 @@ class Shell:
         self.current = self.system
         self.root = self.system
         self.log_file = self.system_path + '.history'
-        display(f'Welcome to Unyx - {self.system_path}')
+        self.output(f'Welcome to Unyx - {self.system_path}')
         self.alliasses = {
             'ls': ['list','ls','dir'],
             'cd': ['chdir','cd'],
@@ -38,12 +38,12 @@ class Shell:
             except EOFError:
                 break
             except KeyboardInterrupt:
-                display("use 'exit' or <ctrl+z> to quit")
+                self.output("use 'exit' or <ctrl+z> to quit")
             command = command.lower()
             command = self.allias(command)
             args = [arg for arg in args if arg != '']
-            self.execute(command,*args)
-
+            ans = self.execute(command,*args)
+            self.output(ans)
             with open(self.system_path, 'wb') as f:
                 pickle.dump(self.system, f)
             with open(self.log_file, 'a') as f:
@@ -81,7 +81,7 @@ class Shell:
             case 'cp':
                 ans = self.cp(*args)
             case '':
-                pass
+                ans = ''
             case 'rename':
                 ans = self.rename(*args)
             case _:
@@ -244,5 +244,18 @@ class Shell:
                 return 'Invalid directory name'
         else:
             return 'Invalid directory name'
-display = print
+    def output(self, value, filename=None):
+        if filename is None:
+            if value is "":
+                return
+            print(value)
+        else:
+            file = self.current.find(filename)
+            if file == 'No such file or directory':
+                ans = self.touch(filename)
+                if ans == 'Invalid file name':
+                    print(ans)
+            file = self.current.find(filename)
+            file.append(value)
+            
 
