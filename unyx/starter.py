@@ -3,7 +3,9 @@ from .unixsys import Root
 import pickle
 import sys
 
-
+if not os.path.exists('instances'):
+    os.mkdir('instances')
+    
 def chose_instance():
     instances = [
         filename
