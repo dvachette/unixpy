@@ -24,11 +24,12 @@ def chose_instance():
 def create_instance():
     instance = Root()
     name = input('Enter the name of the instance: ')
+    os.system(f'touch instances/{name}.unyx')
     try:
         with open(path := f'instances/{name}.unyx', 'wb') as f:
             pickle.dump(instance, f)
-    except OSError:
-        print('Invalid name')
+    except OSError as e:
+        print(f'Invalid name {e}')
         return create_instance()
     except EOFError:
         sys.exit()
