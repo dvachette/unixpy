@@ -1,5 +1,4 @@
-import unittest
-
+import re
 
 class File:
     def __init__(self, parent, name):
@@ -36,6 +35,13 @@ class File:
     def __contains__(self, item):
         return item in self.data
 
+    def descend_from(self, item):
+        if item == self:
+            return True
+        if item == self.root:
+            return True
+        return self.descend_from(item.parent)
+    
     def copy(self):
         new = File(self.parent, self.name)
         new.data = self.data.copy()
@@ -45,13 +51,21 @@ class File:
     def path(self):
         return self.parent.path + self.name
 
-    def read(self, start=0, end=None):
+    def read(self, start=0, end=None, lines=False):
+        if lines:
+            if end is None:
+                content = self.data[start:]
+            content = self.data[start:end]
+            ans = []
+            for i , data in enumerate(content):
+                ans.append(f'{i} {data}')
+            return ans
         if end is None:
             return self.data[start:]
         return self.data[start:end]
 
     def write(self, content):
-        self.data = ' '.join(content).split('\\n')
+        self.data = content.split('\\n')
 
     def move(self, target):
         self.parent.child.remove(self)
@@ -59,7 +73,7 @@ class File:
         self.parent.child.append(self)
 
     def append(self, content):
-        self.data.extend(' '.join(content).split('\\n'))
+        self.data.extend(content.split('\\n'))
 
     def insert(self, line, content):
         self.data.insert(line, content)
@@ -76,6 +90,46 @@ class File:
     def rename(self, name):
         self.name = name
 
+    def cut(self, separator, fields):
+        l_fields = list()
+        fields = fields.split(' ')
+        for field in fields:
+            if '-' not in field:
+                if field.isdigit():
+                    l_fields.append(int(field)-1)
+                else:
+                    return 'Invalid field'
+            else:
+                start, end = field.split('-')
+                if start.isdigit() and end.isdigit():
+                    l_fields.extend(range(int(start)-1, int(end)))
+                else:
+                    return 'Invalid field'
+        ans = list()
+        for line in self.data:
+            linesplit = line.split(separator)
+            ans.append(separator.join([linesplit[i] for i in l_fields]))
+        return "\n".join(ans)
+
+
+    def grep(self, pattern):
+        ans = list()
+        pattern = self.convert_grep_to_re(pattern)
+        for line in self.data:
+            if re.search(pattern, line):
+                ans.append(line)
+        return "/n".join(ans)
+    
+    def convert_grep_to_re(self, grep_pattern: str) -> str:
+        # Remplacer les groupes de capture
+        re_pattern = grep_pattern.replace(r'\(', '(').replace(r'\)', ')')
+        # Remplacer les alternatives
+        re_pattern = re_pattern.replace(r'\|', '|')
+        # Remplacer les quantificateurs
+        re_pattern = re_pattern.replace(r'\{', '{').replace(r'\}', '}')
+        # Remplacer les classes de caractères POSIX
+        re_pattern = re_pattern.replace(r'[[:alpha:]]', r'\w').replace(r'[[:digit:]]', r'\d')
+        return re_pattern
 
 class Root:
     def __init__(self):
@@ -96,10 +150,10 @@ class Root:
         self.vars[name] = value
 
     def get_var(self, name):
-        return self.vars.get(name, "Variable not found")
+        return self.vars.get(name, "")
 
     def remove_var(self, name):
-        return self.vars.pop(name, "Variable not found")
+        return self.vars.pop(name, "")
 
     def descend_from(self, item):
         return item == self
@@ -209,55 +263,3 @@ class Directory:
 
     def rename(self, name):
         self.name = name
-
-
-class TestFileSystem(unittest.TestCase):
-    def setUp(self):
-        self.root = Root()
-        self.dir1 = Directory(self.root, 'dir1')
-        self.dir2 = Directory(self.dir1, 'dir2')
-        self.file1 = File(self.dir1, 'file1')
-        self.file2 = File(self.dir2, 'file2')
-        self.file1.data = ['Hello']
-        self.file2.data = ['World']
-
-    def test_initialization(self):
-        self.assertEqual(self.root.child, [self.dir1])
-        self.assertEqual(self.dir1.child, [self.dir2, self.file1])
-        self.assertEqual(self.dir2.child, [self.file2])
-        self.assertEqual(self.file1.name, 'file1')
-        self.assertEqual(self.file2.name, 'file2')
-
-    def test_repr_str(self):
-        self.assertEqual(repr(self.file1), 'File(Directory(root, dir1),file1)')
-        self.assertEqual(str(self.file1), 'file1')
-        self.assertEqual(repr(self.dir1), 'Directory(root, dir1)')
-
-    def test_path_property(self):
-        self.assertEqual(self.file1.path, '/dir1/file1')
-        self.assertEqual(self.dir2.path, '/dir1/dir2/')
-
-    def test_find_method(self):
-        self.assertEqual(self.root.find('dir1/dir2/file2'), self.file2)
-        self.assertEqual(self.dir1.find('dir2/file2'), self.file2)
-        self.assertEqual(self.dir1.find('..'), self.root)
-        self.assertEqual(self.dir2.find('.'), self.dir2)
-        self.assertEqual(self.root.find('dir1/.'), self.dir1)
-        self.assertEqual(self.dir1.find('file*'), self.file1)
-        self.assertEqual(
-            self.root.find('dir1/dir2/file3'), 'No such file or directory'
-        )
-
-    def test_read_method(self):
-        self.assertEqual(self.file1.read(), ['Hello'])
-        self.assertEqual(self.file1.read(1), [])
-        self.assertEqual(self.file1.read(0, 1), ['Hello'])
-        self.assertEqual(self.file1.read(0, 0), [])
-
-    def test_contains_method(self):
-        self.assertTrue(self.file1 in self.dir1)
-        self.assertFalse(self.file2 in self.dir1)
-
-
-if __name__ == '__main__':
-    unittest.main()

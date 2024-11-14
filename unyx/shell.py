@@ -27,6 +27,10 @@ class Shell:
             'mv': ['move','mv'],
             'rename': ['ren','rn','rename'],
             'var': ['var'],
+            'echo': ['echo'],
+            'cat': ['cat'],
+            'cut': ['cut'],
+            'grep': ['grep']
         }
 
 
@@ -34,30 +38,50 @@ class Shell:
         self.running = True
         while self.running:
             try:
-                command, *args = input(f'{self.current.path} # ').split(' ')
+                # do not space split arguments in quotes
+
+                entered = input(f'{self.current.path} # ')
+                args = re.findall(r'(?:"[^"]*"|[^\s"])+', entered)
+                command = args[0]
+                args = args[1:]
+                args = [arg.replace('"', '') for arg in args]
+
+                
             except EOFError:
                 break
             except KeyboardInterrupt:
-                self.output("use 'exit' or <ctrl+z> to quit")
+                self.output(" Use 'exit' or <ctrl+z> to quit")
+                continue
             command = command.lower()
             command = self.allias(command)
             filename_output = None
+            mode = 'w'
             args = [arg for arg in args if arg != '']
-            if args and args[-2] == '>':
+            if args and len(args) >= 2 and args[-2] == '>':
                 filename_output = args[-1]
                 args = args[:-2]
+                mode = 'w'
+            if args and len(args) >= 2 and args[-2] == '>>':
+                filename_output = args[-1]
+                args = args[:-2]
+                mode = 'a'
             ans = self.execute(command,*args)
-            self.output(ans, filename_output)
+            self.output(ans, filename_output, mode)
             with open(self.system_path, 'wb') as f:
                 pickle.dump(self.system, f)
             with open(self.log_file, 'a') as f:
-                f.write(f'{self.current.path}# {command} {" ".join(args)}\n')
+                f.write(f'{self.current.path} # {command} {" ".join(args)}\n')
+
+                
     def allias(self,value):
         for command, alliasses in self.alliasses.items():
             if value in alliasses:
                 return command
         return value
+
+
     def execute(self, command, *args):
+        ans = str()
         match command:
             case 'exit':
                 self.running = False
@@ -73,6 +97,11 @@ class Shell:
                 ans = self.rm(*args)
             case 'help':
                 ans = self.help(*args)
+            case 'cat':
+                ans = open_(
+                        current=self.current,
+                        args=('-m', 'r', args[-1]),
+                    )
             case 'open':
                 ans = open_(
                         current=self.current,
@@ -88,6 +117,12 @@ class Shell:
                 ans = ''
             case 'rename':
                 ans = self.rename(*args)
+            case 'echo':
+                ans = self.echo(*args)
+            case 'cut':
+                ans = self.cut(*args)
+            case 'grep':
+                ans = self.grep(*args)
             case _:
                 ans = """\
                     Unknow command
@@ -108,6 +143,14 @@ class Shell:
             return 'Not a directory'
         else:
             self.current = target
+
+    def grep(self, *args):
+        filepath = args[-1]
+        file:File = self.current.find(filepath)
+        if file == 'No such file or directory':
+            return file
+        args = args[:-1]
+        return file.grep(*args)
 
     def ls(self, *args):
         target = self.current
@@ -219,7 +262,7 @@ class Shell:
                 return 'File already exists'
         target.move(dest)
     
-    def var(self, args):
+    def var(self, *args):
         if args:
             if args[0] == 'list':
                 return '\n'.join(self.current.root.vars.keys())
@@ -248,18 +291,66 @@ class Shell:
                 return 'Invalid directory name'
         else:
             return 'Invalid directory name'
-    def output(self, value, filename=None):
+
+
+    def echo(self, *args: str):
+        ans = list()
+        for arg in args:
+            if "$" not in arg:
+                ans.append(arg)
+            else:
+                if arg[arg.index("$")-1] == "\\":
+                    ans.append(arg.replace("\\$", "$"))
+                else:
+                    if arg[arg.index("$")+1] == "{":
+                        var = arg[arg.index("{")+1:arg.index("}")]
+                        arg = arg.replace(f'${{{var}}}', self.current.root.get_var(var))
+                    else:
+                        var = arg[arg.index("$")+1:]
+                        arg = arg.replace(f'${var}', self.current.root.get_var(var))
+                    ans.append(arg)
+        return ' '.join(ans)
+
+    def cut(self, *args):
+        filepath = args[-1]
+        file:File = self.current.find(filepath)
+        if file == 'No such file or directory':
+            return file
+
+        sep = None
+        fields = None
+
+        i = 0
+        l = len(args)
+        while i < l:
+            if args[i] == '-d':
+                sep = args[i+1]
+                i += 2
+            elif args[i] == '-f':
+                fields = args[i+1]
+                i += 2
+            else:
+                i += 1
+        if sep is None or fields is None:
+            return 'Invalid arguments'
+        
+        ans = file.cut(sep, fields)
+        return ans
+
+    def output(self, value, filename=None, type_:str='w'):
         if filename is None:
-            if value is "":
+            if value == "":
                 return
             print(value)
         else:
-            file = self.current.find(filename)
+            file:File = self.current.find(filename)
             if file == 'No such file or directory':
                 ans = self.touch(filename)
                 if ans == 'Invalid file name':
                     print(ans)
-            file = self.current.find(filename)
-            file.append(value)
-            
+            file:File = self.current.find(filename)
+            if type_ == 'w':
+                file.write(value)
+            elif type_ == 'a':
+                file.append(value)
 

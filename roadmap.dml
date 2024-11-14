@@ -1,0 +1,40 @@
+for : grep [
+    to : add [
+        options [
+            -i : Ignore casse
+            -c : Count matches
+            -v : Count fails
+        ]  
+    ]
+    : add.later [
+        options [
+            -l : display match sourcefile {
+                This implementation needs a big refactor of the code, because it implies an operation on a whole directory
+            }
+        ]
+    ]
+
+]
+
+for : output [
+    to : add [
+        options [
+            -n : Display line numbers
+        ]
+    ]
+]
+
+for : open [
+    to : edit [
+        empty params : error => params -> ("-m", "r")
+    ]
+]
+
+for : *main* {
+    to add [
+        | : pipe to redirect output to an input {
+            This will be hard, as the system will need to create a temp file, then delete it
+            it will be usefull for things like 'grep pattern file | cut -d splitter -f fields'
+        }
+    ]
+}
