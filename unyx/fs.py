@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import re
+
+from .unyxutils import notImplementedYet
+from .errors import Error
 
 class File:
     def __init__(self, parent, name):
         self.name = name
-        self.parent = parent
+        self.parent:Directory|Root = parent
         self.data = list()
         if isinstance(parent, Root):
             self.root = self.parent
@@ -85,7 +90,7 @@ class File:
         self.data[line] = content
 
     def find(self, path):
-        return 'No such file or directory'
+        return Error(-5)
 
     def rename(self, name):
         self.name = name
@@ -98,13 +103,17 @@ class File:
                 if field.isdigit():
                     l_fields.append(int(field)-1)
                 else:
-                    return 'Invalid field'
+                    ans = Error(-2)
+                    ans.add_description('Invalid field')
+                    return ans
             else:
                 start, end = field.split('-')
                 if start.isdigit() and end.isdigit():
                     l_fields.extend(range(int(start)-1, int(end)))
                 else:
-                    return 'Invalid field'
+                    ans = Error(-2)
+                    ans.add_description('Invalid field')
+                    return ans
         ans = list()
         for line in self.data:
             linesplit = line.split(separator)
@@ -118,7 +127,7 @@ class File:
         for line in self.data:
             if re.search(pattern, line):
                 ans.append(line)
-        return "/n".join(ans)
+        return "\n".join(ans)
     
     def convert_grep_to_re(self, grep_pattern: str) -> str:
         # Remplacer les groupes de capture
@@ -178,7 +187,9 @@ class Root:
                         return item
         if path == '.' or not path or path == '/':
             return self
-        return 'No such file or directory'
+        ans = Error(-1)
+        ans.add_description('No such file or directory')
+        return ans
 
     def __repr__(self):
         return 'root'
@@ -186,7 +197,8 @@ class Root:
     @property
     def path(self):
         return '/'
-
+    
+    @notImplementedYet
     def login(self, user, password):
         return 'Login successful'
 
@@ -228,7 +240,6 @@ class Directory:
         return self.parent.path + self.name + '/'
 
     def find(self, path: str):
-
         if path.startswith('/'):
             return self.root.find(path[1:])
         if '/' in path:
@@ -242,7 +253,7 @@ class Directory:
                     if item.name.startswith(name[:-1]):
                         return item.find(tail)
             target = self.find(name)
-            if target == 'No such file or directory':
+            if isinstance(target, Error):
                 return target
             return target.find(tail)
         if path == '.':
@@ -256,7 +267,9 @@ class Directory:
         for item in self:
             if item.name == path:
                 return item
-        return 'No such file or directory'
+        ans = Error(-1)
+        ans.add_description('No such file or directory')
+        return ans
 
     def __repr__(self):
         return f'Directory({self.parent}, {self.name})'

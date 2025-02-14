@@ -1,4 +1,4 @@
-from .unixsys import File
+from .fs import File
 
 
 def open_(current, args):
@@ -34,8 +34,8 @@ def open_(current, args):
 
     target: File = current.find(args[-1])
 
-    if target == 'No such file or directory':
-        return target
+    if target == -1:
+        return 'No such file or directory'
     
     mode = None
     begin = 0

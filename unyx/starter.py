@@ -1,5 +1,5 @@
 import os
-from .unixsys import Root
+from .fs import Root, Directory
 import pickle
 import sys
 
@@ -25,6 +25,7 @@ def chose_instance():
 
 def create_instance():
     instance = Root()
+    tmp = Directory(instance, 'tmp')
     name = input('Enter the name of the instance: ')
     os.system(f'touch instances/{name}.unyx')
     try:

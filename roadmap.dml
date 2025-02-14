@@ -1,40 +1,64 @@
+{This file is the roadmap of this project, it describes futures tasks.
+It use a custom format, named dml for Donat Markup Language
+in this language, you have some nested fields.
+The main fields are :
+'for' which design which part of the project is targeted
+
+'to' which design which kind of action needs to be done
+'to' can have only some values, and their variants:
+: add
+: remove
+: edit
+all of those fields have some modifier which indicate the emergency level of the described changes
+.later -> no need to hury
+.quick -> it should be in next version ASAP
+.? -> this is some things not sure to be implemented
+
+}
 for : grep [
     to : add [
         options [
-            -i : Ignore casse
-            -c : Count matches
-            -v : Count fails
+            -i : Ignore casse;
+            -c : Count matches;
+            -v : Count fails;
         ]  
     ]
     : add.later [
         options [
             -l : display match sourcefile {
-                This implementation needs a big refactor of the code, because it implies an operation on a whole directory
+                This implementation needs a big refactor of the code, because it implies an operation on a whole directory;
             }
         ]
     ]
 
 ]
 
-for : output [
+: output [
     to : add [
         options [
-            -n : Display line numbers
+            -n : Display line numbers;
+        ]
+    ]
+    : add.quick [
+        streams [
+            stderr : errors will be redirected here;
+            stdout : standard output;
+            stdin : standard input;
         ]
     ]
 ]
 
-for : open [
+: open [
     to : edit [
-        empty params : error => params -> ("-m", "r")
+        empty params : error => params -> ("-m", "r");
     ]
 ]
-
-for : *main* {
-    to add [
+: *main* [
+    to : add [
         | : pipe to redirect output to an input {
             This will be hard, as the system will need to create a temp file, then delete it
             it will be usefull for things like 'grep pattern file | cut -d splitter -f fields'
-        }
+        };
+        scripts : .un files which can be executed, contains unyx commands;
     ]
-}
+]
