@@ -5,7 +5,8 @@ import sys
 
 if not os.path.exists('instances'):
     os.mkdir('instances')
-    
+
+
 def chose_instance():
     instances = [
         filename
@@ -18,7 +19,7 @@ def chose_instance():
     while True:
         choice = input('Enter the number of the instance you want to use: ')
         if choice.isdigit() and 0 < int(choice) <= len(instances):
-            return instances[int(choice)-1]
+            return instances[int(choice) - 1]
         else:
             print('Invalid input')
 
@@ -38,10 +39,12 @@ def create_instance():
         sys.exit()
     return path
 
+
 def delete_instance():
     instance = chose_instance()
     os.remove(f'instances/{instance}')
     print(f'{instance} has been deleted')
+
 
 def start():
     print('1. Create a new instance')

@@ -36,7 +36,7 @@ def open_(current, args):
 
     if target == -1:
         return 'No such file or directory'
-    
+
     mode = None
     begin = 0
     end = None
@@ -44,74 +44,78 @@ def open_(current, args):
     content = None
     ind = 0
 
-    while ind<len(args)-1:
-        elem = args[ind] 
+    while ind < len(args) - 1:
+        elem = args[ind]
         match elem:
             case '-m':
                 try:
-                    mode = args[ind+1]
+                    mode = args[ind + 1]
                 except IndexError:
-                    return "Missing param after -m"
+                    return 'Missing param after -m'
                 else:
                     if mode not in ['r', 'w', 'a', 'e', 'i', 'd']:
                         return "Invalid mode, use 'help open' for more information"
-                ind+=1
+                ind += 1
             case '-b':
                 try:
-                    begin = int(args[ind+1])
+                    begin = int(args[ind + 1])
                 except IndexError:
-                    return "Missing param after -b"
+                    return 'Missing param after -b'
                 except ValueError:
-                    return "Invalid value for -b, must be an integer"
-                ind+=1
+                    return 'Invalid value for -b, must be an integer'
+                ind += 1
             case '-e':
                 try:
-                    end = int(args[ind+1])
+                    end = int(args[ind + 1])
                 except IndexError:
-                    return "Missing param after -e"
+                    return 'Missing param after -e'
                 except ValueError:
-                    return "Invalid value for -e, must be an integer"
-                ind+=1
+                    return 'Invalid value for -e, must be an integer'
+                ind += 1
             case '-l':
                 try:
-                    line = int(args[ind+1])
+                    line = int(args[ind + 1])
                 except IndexError:
-                    return "Missing param after -l"
+                    return 'Missing param after -l'
                 except ValueError:
-                    return "Invalid value for -l, must be an integer"
-                ind+=1
+                    return 'Invalid value for -l, must be an integer'
+                ind += 1
             case '-c':
                 try:
-                    content = args[ind+1]
+                    content = args[ind + 1]
                 except IndexError:
-                    return "Missing param after -c"
+                    return 'Missing param after -c'
                 else:
                     content = content.split(' ')
                     ans = list()
                     for elem in content:
-                        if "$" not in elem:
+                        if '$' not in elem:
                             ans.append(elem)
-                        
+
                         else:
-                            if elem[elem.index("$")-1] == "\\":
-                                ans.append(elem.replace("\\$", "$"))
+                            if elem[elem.index('$') - 1] == '\\':
+                                ans.append(elem.replace('\\$', '$'))
                             else:
-                                if elem[elem.index("$")+1] == "{":
-                                    var = elem[elem.index("{")+1:elem.index("}")]
-                                    elem = elem.replace(f'${{{var}}}', current.root.get_var(var))
+                                if elem[elem.index('$') + 1] == '{':
+                                    var = elem[
+                                        elem.index('{') + 1 : elem.index('}')
+                                    ]
+                                    elem = elem.replace(
+                                        f'${{{var}}}',
+                                        current.root.get_var(var),
+                                    )
                                 else:
-                                    var = elem[elem.index("$")+1:]
-                                    elem = elem.replace(f'${var}', current.root.get_var(var))
+                                    var = elem[elem.index('$') + 1 :]
+                                    elem = elem.replace(
+                                        f'${var}', current.root.get_var(var)
+                                    )
                                 ans.append(elem)
                     content = ' '.join(ans)
-                    
 
-                    
-                ind+=1
+                ind += 1
             case _:
                 return "Invalid syntax, use 'help open' for more information"
-        ind+=1
-
+        ind += 1
 
     match mode:
         case 'r':
