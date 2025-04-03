@@ -5,10 +5,15 @@ import re
 from .unyxutils import notImplementedYet
 from .errors import Error
 
+
+class ContainerFSObject:
+    pass
+
+
 class File:
     def __init__(self, parent, name):
         self.name = name
-        self.parent:Directory|Root = parent
+        self.parent: Directory | Root = parent
         self.data = list()
         if isinstance(parent, Root):
             self.root = self.parent
@@ -46,7 +51,7 @@ class File:
         if item == self.root:
             return True
         return self.descend_from(item.parent)
-    
+
     def copy(self):
         new = File(self.parent, self.name)
         new.data = self.data.copy()
@@ -62,7 +67,7 @@ class File:
                 content = self.data[start:]
             content = self.data[start:end]
             ans = []
-            for i , data in enumerate(content):
+            for i, data in enumerate(content):
                 ans.append(f'{i} {data}')
             return ans
         if end is None:
@@ -101,7 +106,7 @@ class File:
         for field in fields:
             if '-' not in field:
                 if field.isdigit():
-                    l_fields.append(int(field)-1)
+                    l_fields.append(int(field) - 1)
                 else:
                     ans = Error(-2)
                     ans.add_description('Invalid field')
@@ -109,7 +114,7 @@ class File:
             else:
                 start, end = field.split('-')
                 if start.isdigit() and end.isdigit():
-                    l_fields.extend(range(int(start)-1, int(end)))
+                    l_fields.extend(range(int(start) - 1, int(end)))
                 else:
                     ans = Error(-2)
                     ans.add_description('Invalid field')
@@ -118,18 +123,18 @@ class File:
         for line in self.data:
             linesplit = line.split(separator)
             ans.append(separator.join([linesplit[i] for i in l_fields]))
-        return "\n".join(ans)
-
+        return '\n'.join(ans)
 
     def grep(self, pattern):
         ans = list()
-        pattern = self.convert_grep_to_re(pattern)
+        pattern = self.__class__.convert_grep_to_re(pattern)
         for line in self.data:
             if re.search(pattern, line):
                 ans.append(line)
-        return "\n".join(ans)
-    
-    def convert_grep_to_re(self, grep_pattern: str) -> str:
+        return '\n'.join(ans)
+
+    @staticmethod
+    def convert_grep_to_re(grep_pattern: str) -> str:
         # Remplacer les groupes de capture
         re_pattern = grep_pattern.replace(r'\(', '(').replace(r'\)', ')')
         # Remplacer les alternatives
@@ -137,10 +142,64 @@ class File:
         # Remplacer les quantificateurs
         re_pattern = re_pattern.replace(r'\{', '{').replace(r'\}', '}')
         # Remplacer les classes de caractères POSIX
-        re_pattern = re_pattern.replace(r'[[:alpha:]]', r'\w').replace(r'[[:digit:]]', r'\d')
+        re_pattern = re_pattern.replace(r'[[:alpha:]]', r'\w').replace(
+            r'[[:digit:]]', r'\d'
+        )
         return re_pattern
 
-class Root:
+
+class Root(ContainerFSObject):
+    """ Root class for the file system.
+    It contains the root directory and provides methods to manage
+    the file system.
+    It is a singleton class, meaning there is only one instance of it.
+    It is used to manage the file system and provide access to the
+    directories and files in the file system.
+
+    ## Attributes:
+        child (list): List of child directories and files.
+        vars (dict): Dictionary of variables.
+        root (Root): Reference to the root directory.
+    ## Methodes:
+        __len__() ->(int):
+            Returns the number of child directories and files.
+        __contains__(value) -> (bool) :
+            Returns True if the value is in the child list.
+        __iter__() -> (Iterable):
+            Returns an iterator for the child list.
+        add_var(name, value) -> (None):
+            Adds a variable to the vars dictionary.
+        get_var(name) -> (str):
+            Gets a variable from the vars dictionary.
+        remove_var(name) -> (str):
+            Removes a variable from the vars dictionary.
+        descend_from(item) -> (bool):
+            Returns True if the item is a descendant of this directory.
+        find(path) -> (FSBaseObject):
+            Finds a directory or file by its path.
+        __repr__() -> (str):
+            Returns a string representation of the root directory.
+        login(user, password) -x (Exception) :
+            Logs in to the file system. [NIY]
+        path -> (str):
+            Returns the path of the root directory.
+    ## Properties:
+        path (str): Path of the root directory.
+
+    ## Examples:
+    >>> root = Root()
+
+    ### Variables system
+    >>> root.add_var('key', 'value')
+
+    >>> root.get_var('key')
+    'value'
+    >>> root.remove_var('key')
+    'value'
+    >>> root.get_var('key')
+    ''
+    """
+
     def __init__(self):
         self.child = list()
         self.vars = dict()
@@ -159,14 +218,14 @@ class Root:
         self.vars[name] = value
 
     def get_var(self, name):
-        return self.vars.get(name, "")
+        return self.vars.get(name, '')
 
     def remove_var(self, name):
-        return self.vars.pop(name, "")
+        return self.vars.pop(name, '')
 
     def descend_from(self, item):
         return item == self
-    
+
     def find(self, path):
         if '/' in path:
             name, tail = path.split('/', 1)
@@ -197,13 +256,13 @@ class Root:
     @property
     def path(self):
         return '/'
-    
+
     @notImplementedYet
     def login(self, user, password):
         return 'Login successful'
 
 
-class Directory:
+class Directory(ContainerFSObject):
     def __init__(self, parent, name):
         self.child = list()
         self.parent: Directory | Root = parent
@@ -213,7 +272,6 @@ class Directory:
             self.root: Root = self.parent.root
         self.name = name
         self.parent.child.append(self)
-    
 
     def __len__(self):
         return len(self.child)
@@ -221,11 +279,9 @@ class Directory:
     def __iter__(self):
         return iter(self.child)
 
-
     def __contains__(self, value):
         names = [item.name for item in self.child]
         return value.name in names
-
 
     def descend_from(self, item):
         if item == self:
@@ -233,7 +289,6 @@ class Directory:
         if item == self.root:
             return True
         return self.descend_from(item.parent)
-        
 
     @property
     def path(self):
