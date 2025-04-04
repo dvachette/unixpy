@@ -23,7 +23,7 @@ for : grep [
             -v : Count fails;
         ]  
     ]
-    : add.later [
+    : add.? [
         options [
             -l : display match sourcefile {
                 This implementation needs a big refactor of the code, because it implies an operation on a whole directory;
@@ -39,26 +39,10 @@ for : grep [
             -n : Display line numbers;
         ]
     ]
-    : add.quick [
-        streams [
-            stderr : errors will be redirected here;
-            stdout : standard output;
-            stdin : standard input;
-        ]
-    ]
 ]
 
-: open [
-    to : edit [
-        empty params : error => params -> ("-m", "r");
-    ]
-]
 : *main* [
     to : add [
-        | : pipe to redirect output to an input {
-            This will be hard, as the system will need to create a temp file, then delete it
-            it will be usefull for things like 'grep pattern file | cut -d splitter -f fields'
-        };
         scripts : .un files which can be executed, contains unyx commands;
     ]
 ]
