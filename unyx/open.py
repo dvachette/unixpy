@@ -3,30 +3,35 @@ from .fs import File
 
 def open_(current, args):
     r"""
-    parsing the open command
-    open -m <mode> -b <begin_line> [[-e <end_line>] [-c <content>]] [-l <line>] <path>
+    `open -m <mode> -b <begin_line> [[-e <end_line>] [-c <content>]] [-l <line>] <path>`
 
     the content can be multiline, just use \n to separate the lines
 
     modes:
 
     r: read
-    open -m r -b <begin_line> -e <end_line> <path>
+
+    `open -m r -b <begin_line> -e <end_line> <path>`
 
     w: write
-    open -m w -c <content> <path>
+
+    `open -m w -c <content> <path>`
 
     a: append
-    open -m a -c <content> <path>
+
+    `open -m a -c <content> <path>`
 
     e: edit
-    open -m e -l <line> -c <content> <path>
+
+    `open -m e -l <line> -c <content> <path>`
 
     i: insert
-    open -m i -l <line> -c <content> <path>
+
+    `open -m i -l <line> -c <content> <path>`
 
     d: delete
-    open -m d -l <line> <path>
+
+    `open -m d -l <line> <path>`
     """
 
     if len(args) < 1:
