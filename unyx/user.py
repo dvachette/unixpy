@@ -1,8 +1,8 @@
 from .errors import Error
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class User:
-    names: list[str] = []
+    instances = list()
     num: int = 0
 
     def __init__(self):
@@ -14,13 +14,22 @@ class User:
         return self._name
 
     def setName(self, name: str):
-        if name not in self.__class__.names:
-            self.__class__.names.append(name)
+        if any(name == user.name for user in self.__class__.instances):
+            self.__class__.instances.append(self)
             self._name = name
         else:
             result = Error(-2)
-            result.add_description(f'Name {name} already exists')
+            result.add_description(f'User :{name} already exists')
             return result
 
     def __repr__(self):
         return f'User {self.id}: {self.name}'
+
+    @classmethod
+    def getUserByUid(cls, uid: int):
+        for instance in cls.instances:
+            if instance.uid == uid:
+                return instance
+        ans = Error(-7)
+        ans.add_description(f'User with uid {uid} not found')
+        return ans
