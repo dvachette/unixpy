@@ -9,13 +9,16 @@ class Command(metaclass=ABCMeta):
         self.name = name
 
     @abstractmethod
-    def execute(self, *args):
+    def __call__(self, shell, *args):
         """
         Execute the command.
         """
         raise NotImplementedError("Subclasses must implement this method.")
+    
+    @abstractmethod
     def help(self):
         """
         Display help information for the command.
         """
         raise NotImplementedError("Subclasses must implement this method.")
+    

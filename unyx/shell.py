@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pickle
 import re
-
+from .commands import ls, rm
 from .fs import Directory, File, Root, __ContainerFSObject
 from . import man
 from .open import open_
@@ -121,7 +121,7 @@ class Shell:
             case 'exit':
                 self.running = False
             case 'ls':
-                ans = self.ls(*args)
+                ans = ls(self, *args)
             case 'cd':
                 ans = self.cd(*args)
             case 'mkdir':
@@ -129,7 +129,7 @@ class Shell:
             case 'touch':
                 ans = self.touch(*args)
             case 'rm':
-                ans = self.rm(*args)
+                ans = rm(self,*args)
             case 'help':
                 ans = self.help(*args)
             case 'cat':
@@ -217,62 +217,62 @@ class Shell:
         args = args[:-1]
         return file.grep(*args)
 
-    def ls(self, *args):
-        target = self.current
-        flag = False
-
-        if args and args[0] == '-a':
-            args = list(args)
-            flag = True
-            args.pop(0)
-        if args:
-            paths_regex = r'(^/|^\.{1,2}/|^[^/])([^/\0]+/)*([^/\0]+)?'
-            if re.match(paths_regex, args[0]):
-                target = self.current.find(args[0])
-        ans = list()
-        for item in target:
-            if isinstance(item, Directory):
-                if item.name.startswith('.'):
-                    if flag:
-                        ans.append(f'{item.name}/')
-                else:
-                    ans.append(f'{item.name}/')
-            else:
-                if item.name.startswith('.'):
-                    if flag:
-                        ans.append(item.name)
-                else:
-                    ans.append(item.name)
-        return '\n'.join(ans)
-
-    def rm(self, *args):
-        args = list(args)
-        flag = False
-        if args and args[0].lower() in ['-f', '-force']:
-            flag = True
-            args.pop(0)
-        target = self.current.find(args[0])
-        if target == self.current:
-            ans = Error(-5)
-            ans.add_description('Cannot delete current directory')
-            return ans
-        elif isinstance(target, Error):
-            return target
-        else:
-            if isinstance(target, Directory) and len(target):
-                if self.current.descend_from(target):
-                    return 'Cannot delete current or parent directory'
-                else:
-                    if flag:
-                        target.parent.child.remove(target)
-                    else:
-                        ans = Error(-5)
-                        ans.add_description(
-                            'Directory not empty, use rm -f <directory> to force delete'
-                        )
-                        return ans
-            else:
-                target.parent.child.remove(target)
+    #def ls(self, *args):
+    #    target = self.current
+    #    flag = False
+    #
+    #    if args and args[0] == '-a':
+    #        args = list(args)
+    #        flag = True
+    #        args.pop(0)
+    #    if args:
+    #        paths_regex = r'(^/|^\.{1,2}/|^[^/])([^/\0]+/)*([^/\0]+)?'
+    #        if re.match(paths_regex, args[0]):
+    #            target = self.current.find(args[0])
+    #    ans = list()
+    #    for item in target:
+    #        if isinstance(item, Directory):
+    #            if item.name.startswith('.'):
+    #                if flag:
+    #                    ans.append(f'{item.name}/')
+    #            else:
+    #                ans.append(f'{item.name}/')
+    #        else:
+    #            if item.name.startswith('.'):
+    #                if flag:
+    #                    ans.append(item.name)
+    #            else:
+    #                ans.append(item.name)
+    #    return '\n'.join(ans)
+    
+    #def rm(self, *args):
+    #    args = list(args)
+    #    flag = False
+    #    if args and args[0].lower() in ['-f', '-force']:
+    #        flag = True
+    #        args.pop(0)
+    #    target = self.current.find(args[0])
+    #    if target == self.current:
+    #        ans = Error(-5)
+    #        ans.add_description('Cannot delete current directory')
+    #        return ans
+    #    elif isinstance(target, Error):
+    #        return target
+    #    else:
+    #        if isinstance(target, Directory) and len(target):
+    #            if self.current.descend_from(target):
+    #                return 'Cannot delete current or parent directory'
+    #            else:
+    #                if flag:
+    #                    target.parent.child.remove(target)
+    #                else:
+    #                    ans = Error(-5)
+    #                    ans.add_description(
+    #                        'Directory not empty, use rm -f <directory> to force delete'
+    #                    )
+    #                    return ans
+    #        else:
+    #            target.parent.child.remove(target)
 
     def touch(self, *args):
         for item in self.current:
