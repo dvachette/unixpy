@@ -51,3 +51,7 @@ class Group:
             if group._gid == gid:
                 ans = group
         return ans
+
+    def __contains__(self, user: User) -> bool:
+        return user in self._users
+    

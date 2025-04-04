@@ -9,6 +9,7 @@ class User:
         self.__class__.num += 1
         self._name: str
         self.uid: int = self.__class__.num
+        self._password: str
 
     def getName(self):
         return self._name
@@ -26,10 +27,11 @@ class User:
         return f'User {self.id}: {self.name}'
 
     @classmethod
-    def getUserByUid(cls, uid: int):
-        for instance in cls.instances:
-            if instance.uid == uid:
-                return instance
-        ans = Error(-7)
-        ans.add_description(f'User with uid {uid} not found')
-        return ans
+    def login(cls, name: str, password_hashed: str):
+        for user in cls.instances:
+            if user.name == name and check_password_hash(user.password, password_hashed):
+                return user
+        result = Error(-7)
+        result.add_description(f'User :{name} not found')
+        return result
+    
