@@ -10,6 +10,15 @@ class Rm(Command):
     def __call__(self, shell, *args):
         """
         Remove files or directories.
+
+        If the first argument is -f or --force, remove non-empty directories.
+
+        Args:
+            `shell` : The shell instance.
+            `*args`: The arguments passed to the command.
+
+
+
         """
         args = list(args)
         force_remove_directory_flag = False
