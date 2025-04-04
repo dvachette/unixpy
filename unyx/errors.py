@@ -9,6 +9,7 @@ class Error:
     -4 : Internal error
     -5 : Access error
     -6 : Generic error
+    -7 : User not found
     """
 
     codes = {
@@ -18,6 +19,7 @@ class Error:
         -4: 'Internal error',
         -5: 'Access error',
         -6: 'Generic error',
+        -7: 'User not found',
     }
 
     def __init__(self, code: int):
