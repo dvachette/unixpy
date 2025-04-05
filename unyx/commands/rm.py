@@ -17,8 +17,6 @@ class Rm(Command):
             `shell` : The shell instance.
             `*args`: The arguments passed to the command.
 
-
-
         """
         args = list(args)
         force_remove_directory_flag = False

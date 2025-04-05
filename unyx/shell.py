@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pickle
 import re
-from .commands import ls, rm
+from .commands import ls, rm, touch
 from .fs import Directory, File, Root, __ContainerFSObject
 from . import man
 from .open import open_
@@ -127,7 +127,7 @@ class Shell:
             case 'mkdir':
                 ans = self.mkdir(*args)
             case 'touch':
-                ans = self.touch(*args)
+                ans = touch(self, *args)
             case 'rm':
                 ans = rm(self,*args)
             case 'help':
@@ -274,17 +274,17 @@ class Shell:
     #        else:
     #            target.parent.child.remove(target)
 
-    def touch(self, *args):
-        for item in self.current:
-            if item.name == args[0]:
-                return 'File already exists'
-        valid_regex = r'^[^/\\:*?"<>|]+$'
-        if re.match(valid_regex, args[0]):
-            File(self.current, args[0])
-        else:
-            ans = Error(-2)
-            ans.add_description('Invalid file name')
-            return ans
+    #def touch(self, *args):
+    #    for item in self.current:
+    #        if item.name == args[0]:
+    #            return 'File already exists'
+    #    valid_regex = r'^[^/\\:*?"<>|]+$'
+    #    if re.match(valid_regex, args[0]):
+    #        File(self.current, args[0])
+    #    else:
+    #        ans = Error(-2)
+    #        ans.add_description('Invalid file name')
+    #        return ans
 
     def help(self, *args):
         if args:
