@@ -1,13 +1,13 @@
 import re
-from .__bases import __FSObject
-from .__bases import __ContainerFSObject
+from .__bases import _FSObject
+from .__bases import _ContainerFSObject
 from ..errors import Error
 from .root import Root
 
-class File(__FSObject):
+class File(_FSObject):
     def __init__(self, parent, name):
         self.name = name
-        self.parent: __ContainerFSObject = parent
+        self.parent: _ContainerFSObject = parent
         self.data = list()
         if isinstance(parent, Root):
             self.root = self.parent

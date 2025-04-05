@@ -1,12 +1,12 @@
 
 from ..errors import Error
-from .__bases import __ContainerFSObject
-from .__bases import __FSObject
+from .__bases import _ContainerFSObject
+from .__bases import _FSObject
 from .root import Root
-class Directory(__ContainerFSObject):
+class Directory(_ContainerFSObject):
     def __init__(self, parent, name):
         self.child = list()
-        self.parent: __ContainerFSObject = parent
+        self.parent: _ContainerFSObject = parent
         if isinstance(parent, Root):
             self.root: Root = self.parent
         else:

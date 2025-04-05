@@ -3,7 +3,7 @@ from __future__ import annotations
 import pickle
 import re
 from .commands import ls, rm, touch, cd
-from .fs import Directory, File, Root, __ContainerFSObject
+from .fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .open import open_
 from .unyxutils import notImplementedYet
@@ -16,7 +16,7 @@ class Shell:
         self.system_path: str = instance_path
         with open(self.system_path, 'rb') as f:
             self.file_system: Root = pickle.load(f)
-        self.current: __ContainerFSObject = self.file_system
+        self.current: _ContainerFSObject = self.file_system
         self.root: Root = self.file_system
         self.log_file_path: str = self.system_path + '.history'
         self.output(f'Welcome to Unyx - {self.system_path}')

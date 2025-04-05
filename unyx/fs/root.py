@@ -1,11 +1,11 @@
 from ..errors import Error
 from ..unyxutils import notImplementedYet
-from .__bases import __FSObject
-from .__bases import __ContainerFSObject
+from .__bases import _FSObject
+from .__bases import _ContainerFSObject
 from typing import Iterable
 
 
-class Root(__ContainerFSObject):
+class Root(_ContainerFSObject):
     """ Root class for the file system.
     It contains the root directory and provides methods to manage
     the file system.

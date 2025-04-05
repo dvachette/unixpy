@@ -2,7 +2,7 @@
 from .root import Root
 from .file import File
 from .directory import Directory
-from .__bases import __ContainerFSObject
-from .__bases import __FSObject
-all = ['Root', 'File', 'Directory', '__ContainerFSObject', '__FSObject']
+from .__bases import _ContainerFSObject
+from .__bases import _FSObject
+all = ['Root', 'File', 'Directory', '_ContainerFSObject', '_FSObject']
 __all__ = all
