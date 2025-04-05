@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pickle
 import re
-from .commands import ls, rm, touch
+from .commands import ls, rm, touch, cd
 from .fs import Directory, File, Root, __ContainerFSObject
 from . import man
 from .open import open_
@@ -123,7 +123,7 @@ class Shell:
             case 'ls':
                 ans = ls(self, *args)
             case 'cd':
-                ans = self.cd(*args)
+                ans = cd(self, *args)
             case 'mkdir':
                 ans = self.mkdir(*args)
             case 'touch':
