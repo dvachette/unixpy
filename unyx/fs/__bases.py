@@ -11,7 +11,7 @@ class _FSObject(ABC):
 
     pass
 
-class _ContainerFSObject(_FSObject):
+class _ContainerFSObject(_FSObject, ABC):
 
     @abstractmethod
     def __len__(self) -> int:
