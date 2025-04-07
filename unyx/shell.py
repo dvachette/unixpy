@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pickle
 import re
-from .commands import ls, rm, touch, cd
+from .commands import ls, rm, touch, cd, grep
 from .fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .open import open_
@@ -91,7 +91,7 @@ class Shell:
             if '|' in args:   # if pipe is used
                 ans = self.pipe(command, args)   # create the ans using a pipe
             else:
-                ans = self.execute(
+                ans:str|Error = self.execute(
                     command, *args
                 )   # create the ans using the standard method
             self.output(
@@ -157,7 +157,7 @@ class Shell:
             case 'cut':
                 ans = self.cut(*args)
             case 'grep':
-                ans = self.grep(*args)
+                ans = grep(self, *args)
             case _:
                 ans = """\
                     Unknow command
@@ -195,27 +195,27 @@ class Shell:
         self.rm(file_ans.path)
         return ans
 
-    def cd(self, *args):
-        if args:
-            target = self.current.find(args[0])
-        else:
-            return self.current.path
-        if isinstance(target, Error):
-            return target
-        elif isinstance(target, File):
-            ans = Error(-5)
-            ans.add_description('Not a directory')
-            return ans
-        else:
-            self.current = target
+    #def cd(self, *args):
+    #    if args:
+    #        target = self.current.find(args[0])
+    #    else:
+    #        return self.current.path
+    #    if isinstance(target, Error):
+    #        return target
+    #    elif isinstance(target, File):
+    #        ans = Error(-5)
+    #        ans.add_description('Not a directory')
+    #        return ans
+    #    else:
+    #        self.current = target
 
-    def grep(self, *args):
-        filepath = args[-1]
-        file: File | Error = self.current.find(filepath)
-        if isinstance(file, Error):
-            return file
-        args = args[:-1]
-        return file.grep(*args)
+    #def grep(self, *args):
+    #    filepath = args[-1]
+    #    file: File | Error = self.current.find(filepath)
+    #    if isinstance(file, Error):
+    #        return file
+    #    args = args[:-1]
+    #    return file.grep(*args)
 
     #def ls(self, *args):
     #    target = self.current
@@ -316,9 +316,9 @@ class Shell:
             return target
         target.rename(args[1])
 
-    def cp(self, args):
+    def cp(self, *args):
         target = self.current.find(args[0])
-        if isinstance(Error):
+        if isinstance(target, Error):
             return target
         if '/' in args[1]:
             dest, name = args[1].rsplit('/', 1)
@@ -330,8 +330,6 @@ class Shell:
             ans.add_description('Invalid name')
             return ans
         dest = self.current.find(dest)
-        if isinstance(target, Error):
-            return target
         copy = target.copy()
         copy.rename(name)
         copy.move(dest)
