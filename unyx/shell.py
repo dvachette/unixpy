@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pickle
 import re
-from .commands import ls, rm, touch, cd, grep
+from .commands import ls, rm, touch, cd, grep, rename, cp
 from .fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .open import open_
@@ -56,7 +56,7 @@ class Shell:
             except EOFError:
                 break   # Exiting repl
             except KeyboardInterrupt:
-                self.output("Use 'exit' or <ctrl+z> to quit")
+                self.output("\nUse 'exit' or <ctrl+D> to quit")
                 continue
 
             args = list(
@@ -147,11 +147,11 @@ class Shell:
             case 'mv':
                 ans = self.mv(*args)
             case 'cp':
-                ans = self.cp(*args)
+                ans = cp(self, *args)
             case '':
                 ans = ''
             case 'rename':
-                ans = self.rename(*args)
+                ans = rename(self, *args)
             case 'echo':
                 ans = self.echo(*args)
             case 'cut':
@@ -304,35 +304,35 @@ class Shell:
         self.running = False
         return 'Shell closed'
 
-    def rename(self, args):
-        target = self.current.find(args[0])
-        name = args[1]
-        name_regex = r'^[^/\\:*?"<>|]+$'
-        if not re.match(name_regex, name):
-            ans = Error(-2)
-            ans.add_description('Invalid name')
-            return ans
-        if isinstance(target, Error):
-            return target
-        target.rename(args[1])
+    #def rename(self, args):
+    #    target = self.current.find(args[0])
+    #    name = args[1]
+    #    name_regex = r'^[^/\\:*?"<>|]+$'
+    #    if not re.match(name_regex, name):
+    #        ans = Error(-2)
+    #        ans.add_description('Invalid name')
+    #        return ans
+    #    if isinstance(target, Error):
+    #        return target
+    #    target.rename(args[1])
 
-    def cp(self, *args):
-        target = self.current.find(args[0])
-        if isinstance(target, Error):
-            return target
-        if '/' in args[1]:
-            dest, name = args[1].rsplit('/', 1)
-        else:
-            dest, name = '.', args[1]
-        name_regex = r'^[^/\\:*?"<>|]+$'
-        if not re.match(name_regex, name):
-            ans = Error(-2)
-            ans.add_description('Invalid name')
-            return ans
-        dest = self.current.find(dest)
-        copy = target.copy()
-        copy.rename(name)
-        copy.move(dest)
+    #def cp(self, *args):
+    #    target = self.current.find(args[0])
+    #    if isinstance(target, Error):
+    #        return target
+    #    if '/' in args[1]:
+    #        dest, name = args[1].rsplit('/', 1)
+    #    else:
+    #        dest, name = '.', args[1]
+    #    name_regex = r'^[^/\\:*?"<>|]+$'
+    #    if not re.match(name_regex, name):
+    #        ans = Error(-2)
+    #        ans.add_description('Invalid name')
+    #        return ans
+    #    dest = self.current.find(dest)
+    #    copy = target.copy()
+    #    copy.rename(name)
+    #    copy.move(dest)
 
     def mv(self, args):
         target = self.current.find(args[0])
