@@ -20,9 +20,3 @@ class Touch(Command):
             ans = Error(-2)
             ans.add_description('Invalid file name')
             return ans
-        
-    def help(self):
-        """
-        Display help information for the touch command.
-        """
-        return "touch [filename]\n\nCreate a new file with the specified name."

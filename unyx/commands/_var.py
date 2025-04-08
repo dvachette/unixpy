@@ -21,6 +21,3 @@ class Var(Command):
                         return shell.current.root.get_var(args[1])
                     case 'del':
                         shell.current.root.remove_var(args[1])
-
-    def help(self):
-        return """var # TODO"""

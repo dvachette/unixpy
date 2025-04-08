@@ -36,10 +36,3 @@ class Ls(Command):
                 else:
                     ans.append(item.name)
         return '\n'.join(ans)
-
-
-    def help(self):
-        """
-        Display help information for the ls command.
-        """
-        return "ls [path]\n\nList the contents of the current directory or the directory at the specified path."

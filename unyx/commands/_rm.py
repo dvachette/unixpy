@@ -47,9 +47,3 @@ class Rm(Command):
                         return ans
             else:
                 target.parent.child.remove(target)
-
-    def help(self):
-        """
-        Display help information for the rm command.
-        """
-        return "rm [path]\n\nRemove files or directories. Use -f to force remove non-empty directories."

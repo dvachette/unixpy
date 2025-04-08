@@ -12,9 +12,3 @@ class Grep(Command):
             return file
         args = args[:-1]
         return file.grep(*args)
-    
-    def help(self):
-        """
-        Display help information for the grep command.
-        """
-        return "grep [pattern] [file]\n\nSearch for a pattern in a file."

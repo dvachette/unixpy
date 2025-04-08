@@ -24,6 +24,3 @@ class Rename(Command):
             ans.add_description("Cannot rename root")
             return ans
         target.rename(args[1])
-
-    def help(self):
-        return "rn [target] [name]\n\nRename the targeted element"

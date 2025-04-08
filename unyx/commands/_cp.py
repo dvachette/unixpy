@@ -22,6 +22,3 @@ class Cp(Command):
         copy = target.copy()
         copy.rename(name)
         copy.move(dest)
-    
-    def help():
-        return "cp [target]"

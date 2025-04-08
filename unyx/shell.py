@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pickle
 import re
-from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var
+from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var, mkdir
 from .fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .open import open_
@@ -125,7 +125,7 @@ class Shell:
             case 'cd':
                 ans = cd(self, *args)
             case 'mkdir':
-                ans = self.mkdir(*args)
+                ans = mkdir(self, *args)
             case 'touch':
                 ans = touch(self, *args)
             case 'rm':
@@ -367,24 +367,24 @@ class Shell:
     #                case 'del':
     #                    self.current.root.remove_var(args[1])
 
-    def mkdir(self, *args):
-        for item in self.current:
-            if item.name == args[0]:
-                ans = Error(-2)
-                ans.add_description('Directory already exists')
-                return ans
-        valid_regex = r'^[^/\\:*?"<>|\s]+$'
-        if re.match(valid_regex, args[0]):
-            if not all([char == '.' for char in args[0]]):
-                Directory(self.current, args[0])
-            else:
-                ans = Error(-2)
-                ans.add_description('Invalid directory name')
-                return ans
-        else:
-            ans = Error(-2)
-            ans.add_description('Invalid directory name')
-            return ans
+    #def mkdir(self, *args):
+    #    for item in self.current:
+    #        if item.name == args[0]:
+    #            ans = Error(-2)
+    #            ans.add_description('Directory already exists')
+    #            return ans
+    #    valid_regex = r'^[^/\\:*?"<>|\s]+$'
+    #    if re.match(valid_regex, args[0]):
+    #        if not all([char == '.' for char in args[0]]):
+    #            Directory(self.current, args[0])
+    #        else:
+    #            ans = Error(-2)
+    #            ans.add_description('Invalid directory name')
+    #            return ans
+    #    else:
+    #        ans = Error(-2)
+    #        ans.add_description('Invalid directory name')
+    #        return ans
 
     def echo(self, *args: str):
         ans = list()

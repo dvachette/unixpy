@@ -9,7 +9,7 @@ from ._rename import Rename as RenameCommand
 from ._cp import Cp as CpCommand
 from ._mv import Mv as MvCommand
 from ._var import Var as VarCommand
-
+from ._mkdir import Mkdir as MkdirCommand
 # List of all commands
 
 # Initialize command instances
@@ -22,3 +22,4 @@ rename = RenameCommand()
 cp = CpCommand()
 mv = MvCommand()
 var = VarCommand()
+mkdir = MkdirCommand()

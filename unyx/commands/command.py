@@ -14,11 +14,3 @@ class Command(metaclass=ABCMeta):
         Execute the command.
         """
         raise NotImplementedError("Subclasses must implement this method.")
-    
-    @abstractmethod
-    def help(self):
-        """
-        Display help information for the command.
-        """
-        raise NotImplementedError("Subclasses must implement this method.")
-    

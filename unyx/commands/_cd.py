@@ -26,9 +26,3 @@ class Cd(Command):
             return ans
         else:
             shell.current = target
-    
-    def help(self):
-        """
-        Display help information for the cd command.
-        """
-        return "cd [path]\n\nChange the current directory to the specified path."

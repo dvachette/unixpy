@@ -19,6 +19,3 @@ class Mv(Command):
                 ans.add_description('File already exists')
                 return ans
         target.move(dest)
-    
-    def help(self):
-        return "mv [src] [dest]"
