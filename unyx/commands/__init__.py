@@ -10,6 +10,9 @@ from ._cp import Cp as CpCommand
 from ._mv import Mv as MvCommand
 from ._var import Var as VarCommand
 from ._mkdir import Mkdir as MkdirCommand
+from ._echo import Echo as EchoCommand
+
+
 # List of all commands
 
 # Initialize command instances
@@ -23,3 +26,4 @@ cp = CpCommand()
 mv = MvCommand()
 var = VarCommand()
 mkdir = MkdirCommand()
+echo = EchoCommand()

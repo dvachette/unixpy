@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pickle
 import re
-from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var, mkdir
+from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var, mkdir, echo
 from .fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .open import open_
@@ -153,7 +153,7 @@ class Shell:
             case 'rename':
                 ans = rename(self, *args)
             case 'echo':
-                ans = self.echo(*args)
+                ans = echo(self, *args)
             case 'cut':
                 ans = self.cut(*args)
             case 'grep':
@@ -386,27 +386,27 @@ class Shell:
     #        ans.add_description('Invalid directory name')
     #        return ans
 
-    def echo(self, *args: str):
-        ans = list()
-        for arg in args:
-            if '$' not in arg:
-                ans.append(arg)
-            else:
-                if arg[arg.index('$') - 1] == '\\':
-                    ans.append(arg.replace('\\$', '$'))
-                else:
-                    if arg[arg.index('$') + 1] == '{':
-                        var = arg[arg.index('{') + 1 : arg.index('}')]
-                        arg = arg.replace(
-                            f'${{{var}}}', self.current.root.get_var(var)
-                        )
-                    else:
-                        var = arg[arg.index('$') + 1 :]
-                        arg = arg.replace(
-                            f'${var}', self.current.root.get_var(var)
-                        )
-                    ans.append(arg)
-        return ' '.join(ans)
+    #def echo(self, *args: str):
+    #    ans = list()
+    #    for arg in args:
+    #        if '$' not in arg:
+    #            ans.append(arg)
+    #        else:
+    #            if arg[arg.index('$') - 1] == '\\':
+    #                ans.append(arg.replace('\\$', '$'))
+    #            else:
+    #                if arg[arg.index('$') + 1] == '{':
+    #                    var = arg[arg.index('{') + 1 : arg.index('}')]
+    #                    arg = arg.replace(
+    #                        f'${{{var}}}', self.current.root.get_var(var)
+    #                    )
+    #                else:
+    #                    var = arg[arg.index('$') + 1 :]
+    #                    arg = arg.replace(
+    #                        f'${var}', self.current.root.get_var(var)
+    #                    )
+    #                ans.append(arg)
+    #    return ' '.join(ans)
 
     def cut(self, *args):
         if len(args) < 4:
