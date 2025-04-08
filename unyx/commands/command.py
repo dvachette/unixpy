@@ -1,4 +1,12 @@
+from __future__ import annotations
+
 from abc import abstractmethod, ABCMeta
+from ..errors import Error
+
+
+class Shell:
+    ...
+
 
 class Command(metaclass=ABCMeta):
     """
@@ -9,7 +17,7 @@ class Command(metaclass=ABCMeta):
         self.name = name
 
     @abstractmethod
-    def __call__(self, shell, *args):
+    def __call__(self, shell:Shell, *args) -> Error | str:
         """
         Execute the command.
         """

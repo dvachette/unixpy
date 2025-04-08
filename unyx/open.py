@@ -1,5 +1,5 @@
-from .fs import File
-
+from .fs import File, _ContainerFSObject
+from .errors import Error
 
 def open_(current, args):
     r"""
@@ -39,9 +39,12 @@ def open_(current, args):
 
     target: File = current.find(args[-1])
 
-    if target == -1:
-        return 'No such file or directory'
-
+    if isinstance(target, Error):
+        return target
+    
+    if isinstance(target, _ContainerFSObject):
+        ans = Error(-5)
+        ans.add_description(f"{args[-1]} is not a file")
     mode = None
     begin = 0
     end = None
@@ -127,18 +130,13 @@ def open_(current, args):
             return '\n'.join(target.read(begin, end))
         case 'w':
             target.write(content)
-            return 'done'
         case 'a':
             target.append(content)
-            return 'done'
         case 'e':
             target.edit(line, content)
-            return 'done'
         case 'i':
             target.insert(line, content)
-            return 'done'
         case 'd':
             target.delete(line)
-            return 'done'
         case _:
             return "Invalid mode, use 'help open' for more information"

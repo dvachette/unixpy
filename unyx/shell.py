@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pickle
 import re
-from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var, mkdir, echo
+from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var, mkdir, echo, cut
 from .fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .open import open_
@@ -155,7 +155,7 @@ class Shell:
             case 'echo':
                 ans = echo(self, *args)
             case 'cut':
-                ans = self.cut(*args)
+                ans = cut(self, *args)
             case 'grep':
                 ans = grep(self, *args)
             case _:
@@ -408,37 +408,34 @@ class Shell:
     #                ans.append(arg)
     #    return ' '.join(ans)
 
-    def cut(self, *args):
-        if len(args) < 4:
-            ans = Error(-3)
-            ans.add_description('Missing arguments')
-            return ans
-        filepath = args[-1]
-        file: File = self.current.find(filepath)
-        if isinstance(file, Error):
-            return file
-
-        sep = None
-        fields = None
-
-        i = 0
-        l = len(args)
-        while i < l:
-            if args[i] == '-d':
-                sep = args[i + 1]
-                i += 2
-            elif args[i] == '-f':
-                fields = args[i + 1]
-                i += 2
-            else:
-                i += 1
-        if sep is None or fields is None:
-            ans = Error(-3)
-            ans.add_description('Missing either -d or -f option')
-            return ans
-
-        ans = file.cut(sep, fields)
-        return ans
+    #def cut(self, *args):
+    #    if len(args) < 4:
+    #        ans = Error(-3)
+    #        ans.add_description('Missing arguments')
+    #        return ans
+    #    filepath = args[-1]
+    #    file: File = self.current.find(filepath)
+    #    if isinstance(file, Error):
+    #        return file
+    #    sep = None
+    #    fields = None
+    #    i = 0
+    #    l = len(args)
+    #    while i < l:
+    #        if args[i] == '-d':
+    #            sep = args[i + 1]
+    #            i += 2
+    #        elif args[i] == '-f':
+    #            fields = args[i + 1]
+    #            i += 2
+    #        else:
+    #            i += 1
+    #    if sep is None or fields is None:
+    #        ans = Error(-3)
+    #        ans.add_description('Missing either -d or -f option')
+    #        return ans
+    #    ans = file.cut(sep, fields)
+    #    return ans
 
     def output(self, value, filename=None, type_: str = 'w'):
         if filename is None:

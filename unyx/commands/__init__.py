@@ -11,7 +11,7 @@ from ._mv import Mv as MvCommand
 from ._var import Var as VarCommand
 from ._mkdir import Mkdir as MkdirCommand
 from ._echo import Echo as EchoCommand
-
+from ._cut import Cut as CutCommand
 
 # List of all commands
 
@@ -27,3 +27,4 @@ mv = MvCommand()
 var = VarCommand()
 mkdir = MkdirCommand()
 echo = EchoCommand()
+cut = CutCommand()
