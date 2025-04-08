@@ -8,6 +8,8 @@ from ._grep import Grep as GrepCommand
 from ._rename import Rename as RenameCommand
 from ._cp import Cp as CpCommand
 from ._mv import Mv as MvCommand
+from ._var import Var as VarCommand
+
 # List of all commands
 
 # Initialize command instances
@@ -19,3 +21,4 @@ grep = GrepCommand()
 rename = RenameCommand()
 cp = CpCommand()
 mv = MvCommand()
+var = VarCommand()

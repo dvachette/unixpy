@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pickle
 import re
-from .commands import ls, rm, touch, cd, grep, rename, cp, mv
+from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var
 from .fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .open import open_
@@ -143,7 +143,7 @@ class Shell:
                     args=args,
                 )
             case 'var':
-                ans = self.var(*args)
+                ans = var(self, *args)
             case 'mv':
                 ans = mv(self, *args)
             case 'cp':
@@ -350,22 +350,22 @@ class Shell:
     #            return ans
     #    target.move(dest)
 
-    def var(self, *args):
-        if args:
-            if args[0] == 'list':
-                return '\n'.join(self.current.root.vars.keys())
-            elif args[0] == 'dict':
-                return '\n'.join(
-                    [f'{key} = {value}' for key, value in self.current.root.vars.items()]
-                )
-            elif len(args) >= 2:
-                match args[0]:
-                    case 'set':
-                        self.current.root.vars[args[1]] = ' '.join(args[2:])
-                    case 'get':
-                        return self.current.root.get_var(args[1])
-                    case 'del':
-                        self.current.root.remove_var(args[1])
+    #def var(self, *args):
+    #    if args:
+    #        if args[0] == 'list':
+    #            return '\n'.join(self.current.root.vars.keys())
+    #        elif args[0] == 'dict':
+    #            return '\n'.join(
+    #                [f'{key} = {value}' for key, value in self.current.root.vars.items()]
+    #            )
+    #        elif len(args) >= 2:
+    #            match args[0]:
+    #                case 'set':
+    #                    self.current.root.vars[args[1]] = ' '.join(args[2:])
+    #                case 'get':
+    #                    return self.current.root.get_var(args[1])
+    #                case 'del':
+    #                    self.current.root.remove_var(args[1])
 
     def mkdir(self, *args):
         for item in self.current:
