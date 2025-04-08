@@ -82,7 +82,7 @@ def open_(current, args):
                 ind += 1
             case '-l':
                 try:
-                    line = int(args[ind + 1])
+                    line = int(args[ind + 1] - 1)
                 except IndexError:
                     return 'Missing param after -l'
                 except ValueError:
@@ -124,19 +124,25 @@ def open_(current, args):
             case _:
                 return "Invalid syntax, use 'help open' for more information"
         ind += 1
-
-    match mode:
-        case 'r':
-            return '\n'.join(target.read(begin, end))
-        case 'w':
-            target.write(content)
-        case 'a':
-            target.append(content)
-        case 'e':
-            target.edit(line, content)
-        case 'i':
-            target.insert(line, content)
-        case 'd':
-            target.delete(line)
-        case _:
-            return "Invalid mode, use 'help open' for more information"
+    try:
+        match mode:
+            case 'r':
+                ans = '\n'.join(target.read(begin, end))
+            case 'w':
+                target.write(content)
+            case 'a':
+                target.append(content)
+            case 'e':
+                target.edit(line, content)
+            case 'i':
+                target.insert(line, content)
+            case 'd':
+                target.delete(line)
+            case _:
+                ans = Error(-2)
+                ans.add_description('Unknow mode')
+    except IndexError:
+        ans = Error(-2)
+        ans.add_description("Given field is out of range")
+    
+    return ans

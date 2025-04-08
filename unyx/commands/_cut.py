@@ -15,7 +15,7 @@ class Cut(Command):
             ans.add_description('Missing arguments')
             return ans
         filepath = args[-1]
-        file: _FSObject = shell.current.find(filepath)
+        file: _FSObject | Error = shell.current.find(filepath)
         if isinstance(file, Error):
             return file
         if isinstance(file, _ContainerFSObject):

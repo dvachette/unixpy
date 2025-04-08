@@ -8,7 +8,7 @@ class File(_FSObject):
     def __init__(self, parent, name):
         self.name = name
         self.parent: _ContainerFSObject = parent
-        self.data = list()
+        self.data:list[str] = list()
         if isinstance(parent, Root):
             self.root = self.parent
         else:
@@ -115,8 +115,11 @@ class File(_FSObject):
                     return ans
         ans = list()
         for line in self.data:
-            linesplit = line.split(separator)
-            ans.append(separator.join([linesplit[i] for i in l_fields]))
+            if separator in line:
+                linesplit = line.split(separator)
+                ans.append(separator.join([linesplit[i] for i in l_fields if i < len(linesplit)]))
+            else:
+                ans.append(line)
         return '\n'.join(ans)
 
     def grep(self, pattern):
