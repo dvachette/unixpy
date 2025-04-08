@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pickle
 import re
-from .commands import ls, rm, touch, cd, grep, rename, cp
+from .commands import ls, rm, touch, cd, grep, rename, cp, mv
 from .fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .open import open_
@@ -145,7 +145,7 @@ class Shell:
             case 'var':
                 ans = self.var(*args)
             case 'mv':
-                ans = self.mv(*args)
+                ans = mv(self, *args)
             case 'cp':
                 ans = cp(self, *args)
             case '':
@@ -334,21 +334,21 @@ class Shell:
     #    copy.rename(name)
     #    copy.move(dest)
 
-    def mv(self, args):
-        target = self.current.find(args[0])
-        dest = self.current.find(args[1])
-        if isinstance(target, Error):
-            target.add_description('Invalid target')
-            return target
-        if isinstance(dest, Error):
-            dest.add_description('Destination not found')
-            return dest
-        for item in dest.child:
-            if item.name == target.name:
-                ans = Error(-2)
-                ans.add_description('File already exists')
-                return ans
-        target.move(dest)
+    #def mv(self, args):
+    #    target = self.current.find(args[0])
+    #    dest = self.current.find(args[1])
+    #    if isinstance(target, Error):
+    #        target.add_description('Invalid target')
+    #        return target
+    #    if isinstance(dest, Error):
+    #        dest.add_description('Destination not found')
+    #        return dest
+    #    for item in dest.child:
+    #        if item.name == target.name:
+    #            ans = Error(-2)
+    #            ans.add_description('File already exists')
+    #            return ans
+    #    target.move(dest)
 
     def var(self, *args):
         if args:
@@ -356,7 +356,7 @@ class Shell:
                 return '\n'.join(self.current.root.vars.keys())
             elif args[0] == 'dict':
                 return '\n'.join(
-                    [f'{key}={value}' for key, value in self.current.root.vars]
+                    [f'{key} = {value}' for key, value in self.current.root.vars.items()]
                 )
             elif len(args) >= 2:
                 match args[0]:

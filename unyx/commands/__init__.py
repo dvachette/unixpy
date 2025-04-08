@@ -7,6 +7,7 @@ from ._cd import Cd as CdCommand
 from ._grep import Grep as GrepCommand
 from ._rename import Rename as RenameCommand
 from ._cp import Cp as CpCommand
+from ._mv import Mv as MvCommand
 # List of all commands
 
 # Initialize command instances
@@ -17,3 +18,4 @@ cd = CdCommand()
 grep = GrepCommand()
 rename = RenameCommand()
 cp = CpCommand()
+mv = MvCommand()
