@@ -39,8 +39,10 @@ class FS:
             'cut': ['cut'],
             'grep': ['grep'],
             'sudo': ['sudo'],
+            'pwd': ['pwd'],
         }
         self.commands: dict[str : function] = {
+            'pwd': self.pwd,
             'ls': self.ls,
             'cd': self.cd,
             'mkdir': self.mkdir,
