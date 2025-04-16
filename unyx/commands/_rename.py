@@ -2,7 +2,7 @@ import re
 
 from ..errors import Error
 from .command import Command
-from ..fs import Root
+from .._fs import Root
 
 
 class Rename(Command):

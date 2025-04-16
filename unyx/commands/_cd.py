@@ -1,5 +1,5 @@
 from .command import Command
-from ..fs import _ContainerFSObject
+from .._fs import _ContainerFSObject
 from ..errors import Error
 class Cd(Command):
     def __init__(self):

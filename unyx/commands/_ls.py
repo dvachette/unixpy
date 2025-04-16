@@ -1,6 +1,6 @@
 import re
 from .command import Command
-from ..fs import Directory
+from .._fs import Directory
 class Ls(Command):
     """
     List the contents of the current directory or the directory at the specified path.

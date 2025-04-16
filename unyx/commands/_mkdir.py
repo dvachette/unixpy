@@ -1,7 +1,7 @@
 import re
 from .command import Command
 from ..errors import Error
-from ..fs import Directory
+from .._fs import Directory
 
 class Mkdir(Command):
     def __init__(self):

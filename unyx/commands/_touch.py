@@ -1,5 +1,5 @@
 import re
-from..fs import File
+from.._fs import File
 from ..errors import Error
 from .command import Command
 

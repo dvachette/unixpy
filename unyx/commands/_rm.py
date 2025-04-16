@@ -1,5 +1,5 @@
 from .command import Command
-from ..fs import Directory
+from .._fs import Directory
 from ..errors import Error
 
 class Rm(Command):

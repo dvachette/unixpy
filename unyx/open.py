@@ -1,4 +1,4 @@
-from .fs import File, _ContainerFSObject
+from ._fs import File, _ContainerFSObject
 from .errors import Error
 
 def open_(current, args):

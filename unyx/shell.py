@@ -3,14 +3,14 @@ from __future__ import annotations
 import pickle
 import re
 from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var, mkdir, echo, cut
-from .fs import Directory, File, Root, _ContainerFSObject
+from ._fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .open import open_
 from .unyxutils import notImplementedYet
 from .errors import Error
 
 
-class Shell:
+class FS:
     def __init__(self, instance_path: str):
         self.running: bool = False
         self.system_path: str = instance_path
@@ -40,7 +40,7 @@ class Shell:
             'sudo': ['sudo'],
         }
 
-    def run(self):
+    def REPL(self):
         self.running = True
         while self.running:
             try:

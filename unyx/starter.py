@@ -1,5 +1,5 @@
 import os
-from .fs import Root, Directory
+from ._fs import Root, Directory
 import pickle
 import sys
 

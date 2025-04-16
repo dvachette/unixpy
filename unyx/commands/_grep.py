@@ -1,5 +1,5 @@
 from .command import Command
-from ..fs import File
+from .._fs import File
 from ..errors import Error
 class Grep(Command):
     def __init__(self):

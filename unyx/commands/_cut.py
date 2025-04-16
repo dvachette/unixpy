@@ -1,5 +1,5 @@
 from .command import Command
-from ..fs import _FSObject, _ContainerFSObject
+from .._fs import _FSObject, _ContainerFSObject
 from ..errors import Error
 
 
