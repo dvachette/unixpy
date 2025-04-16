@@ -51,7 +51,7 @@ def open_(current, args):
     line = None
     content = None
     ind = 0
-
+    ans = None
     while ind < len(args) - 1:
         elem = args[ind]
         match elem:
@@ -90,19 +90,19 @@ def open_(current, args):
                 ind += 1
             case '-c':
                 try:
-                    content = args[ind + 1]
+                    content_arg = args[ind + 1]
                 except IndexError:
                     return 'Missing param after -c'
                 else:
-                    content = content.split(' ')
-                    ans = list()
-                    for elem in content:
+                    content_arg = content_arg.split(' ')
+                    content = list()
+                    for elem in content_arg:
                         if '$' not in elem:
-                            ans.append(elem)
+                            content.append(elem)
 
                         else:
                             if elem[elem.index('$') - 1] == '\\':
-                                ans.append(elem.replace('\\$', '$'))
+                                content.append(elem.replace('\\$', '$'))
                             else:
                                 if elem[elem.index('$') + 1] == '{':
                                     var = elem[
@@ -117,8 +117,8 @@ def open_(current, args):
                                     elem = elem.replace(
                                         f'${var}', current.root.get_var(var)
                                     )
-                                ans.append(elem)
-                    content = ' '.join(ans)
+                                content.append(elem)
+                    content = ' '.join(content)
 
                 ind += 1
             case _:
@@ -144,5 +144,4 @@ def open_(current, args):
     except IndexError:
         ans = Error(-2)
         ans.add_description("Given field is out of range")
-    
     return ans

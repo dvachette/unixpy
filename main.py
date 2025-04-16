@@ -1,5 +1,6 @@
 from unyx import starter
-from unyx import shell
+from unyx import FS
 
 path = starter.start()
-shell.Shell(path).REPL()
+fs = FS.FS(path)
+fs.REPL()
