@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Callable, Literal 
 import pickle
 import re
 from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var, mkdir, echo, cut
@@ -42,24 +43,24 @@ class FS:
             'pwd': ['pwd'],
         }
         self.commands: dict[str : function] = {
-            'pwd': self.pwd,
-            'ls': self.ls,
-            'cd': self.cd,
-            'mkdir': self.mkdir,
-            'touch': self.touch,
-            'rm': self.rm,
-            'help': self.help,
-            'open': open_,
-            'var': self.var,
-            'mv': self.mv,
-            'cp': self.cp,
-            'rename': self.rename,
-            'echo': self.echo,
-            'cut': self.cut,
-            'grep': self.grep,
-            'sudo': self.sudo,
-            'cat': self.cat,
-            'exit': self.exit,
+            'pwd': self._pwd,
+            'ls': self._ls,
+            'cd': self._cd,
+            'mkdir': self._mkdir,
+            'touch': self._touch,
+            'rm': self._rm,
+            'help': self._help,
+            'open': self._open,
+            'var': self._var,
+            'mv': self._mv,
+            'cp': self._cp,
+            'rename': self._rename,
+            'echo': self._echo,
+            'cut': self._cut,
+            'grep': self._grep,
+            'sudo': self._sudo,
+            'cat': self._cat,
+            'exit': self._exit,
             '': lambda: '',
         }
 
@@ -128,10 +129,7 @@ class FS:
                 ans, filename_output, mode
             )   # output the ans to the console or to a file
 
-            with open(
-                self.system_path, 'wb'
-            ) as f:   # save the system to the file
-                pickle.dump(self.file_system, f)
+            self.save()
             return ans
 
     def allias(self, value):
@@ -147,67 +145,81 @@ class FS:
             ans = ''
         return ans
 
-    def cat(self, *args):
+    def _cat(self, *args):
         ans = open_(current=self.current, args=('-m', 'r', args[-1]))
+        self.save()
         return ans
 
-    def ls(self, *args):
+    def _ls(self, *args):
         ans = ls(self, *args)
+        self.save()
         return ans
 
-    def cd(self, *args):
+    def _cd(self, *args):
         ans = cd(self, *args)
+        self.save()
         return ans
     
-    def mkdir(self, *args):
+    def _mkdir(self, *args):
         ans = mkdir(self, *args)
+        self.save()
         return ans
     
-    def touch(self, *args):
+    def _touch(self, *args):
         ans = touch(self, *args)
+        self.save()
         return ans  
     
-    def rm(self, *args):
+    def _rm(self, *args):
         ans = rm(self, *args)
+        self.save()
         return ans
     
-    def open(self, *args):
+    def _open(self, *args):
         ans = open_(current=self.current, args=args)
+        self.save()
         return ans
     
-    def var(self, *args):
+    def _var(self, *args):
         ans = var(self, *args)
+        self.save()
         return ans
     
-    def mv(self, *args):
+    def _mv(self, *args):
         ans = mv(self, *args)
+        self.save()
         return ans
     
-    def cp(self, *args):
+    def _cp(self, *args):
         ans = cp(self, *args)
+        self.save()
         return ans
     
-    def rename(self, *args):
+    def _rename(self, *args):
         ans = rename(self, *args)
+        self.save()
         return ans
     
-    def echo(self, *args):
+    def _echo(self, *args):
         ans = echo(self, *args)
+        self.save()
         return ans
     
-    def cut(self, *args):
+    def _cut(self, *args):
         ans = cut(self, *args)
+        self.save()
         return ans
     
-    def grep(self, *args):
+    def _grep(self, *args):
         ans = grep(self, *args)
+        self.save()
         return ans
     
-    def pwd(self, *args):
-        return self.current.path()
+    def _pwd(self, *args):
+        return self.current.path
 
     @notImplementedYet
-    def sudo(self, *args):
+    def _sudo(self, *args):
         pass
 
 
@@ -237,10 +249,10 @@ class FS:
                     return txt_ans
                 file_ans.write(txt_ans)
         ans = txt_ans
-        self.rm(file_ans.path)
+        self._rm(file_ans.path)
         return ans
 
-    def help(self, *args):
+    def _help(self, *args):
         if args:
             req = args[0]
         else:
@@ -254,13 +266,118 @@ class FS:
         else:
             return doc()
 
-    def exit(self, *args):
-        # *args is not used but is required to match the function signature
-        # of the REPL method
+    def _exit(self, *args):
+        # . *args is not used but is required to match the function signature of the REPL method
         self.running = False
-        return 'Shell closed'
+        return 'REPL closed'
 
-    def output(self, value, filename=None, type_: str = 'w'):
+    def readfile(self, filepath:str) -> str | Error:
+        return self._cat(filepath)
+
+    def listdir(self, dirpath=None) -> list[str] | Error:
+        if dirpath is None:
+            return self._ls().split('\n')
+        return self._ls(dirpath).split('\n')
+    
+    def chdir(self, dirpath:str) -> None | Error:
+        return self._cd(dirpath)
+    
+    def makedir(self, dirname:str) -> None | Error:
+        return self._mkdir(dirname)
+
+    def makefile(self, filename:str) -> None | Error:
+        return self._touch(filename)
+
+    def rmdir(self, dirpath:str) -> None | Error:
+        return self._rm("-f", dirpath)
+
+    def removefile(self, filename:str) -> None | Error:
+        return self._rm(filename)
+    
+    def open(self, filename:str, mode:Literal['a', 'e', 'r', 'w', 'i', 'd']=None, content:str=None, line:int=None, begin:int=None, end:int=None) -> str | Error:
+        if mode is None:
+            return self._cat(filename)
+        args = ['-m', mode]
+        if content is not None:
+            args.extend(['-c', content])
+        if line is not None:
+            args.extend(['-l', line])
+        if begin is not None:
+            args.extend(['-b', begin])
+        if end is not None:
+            args.extend(['-e', end])
+        args.append(filename)
+        return self._open(*tuple(args))
+
+    def writeinfile(self, filename:str, content:str) -> None | Error:
+        return self._open('-m', 'w', '-c', content, filename)
+    
+    def appendinfile(self, filename:str, content:str) -> None | Error:
+        return self._open('-m', 'a', '-c', content, filename)
+    
+    def editinfile(self, filename:str, content:str, line:int) -> None | Error:
+        return self._open('-m', 'e', '-c', content, '-l', str(line), filename)
+    
+    def insertinfile(self, filename:str, content:str, line:int) -> None | Error:
+        return self._open('-m', 'i', '-c', content, '-l', str(line), filename)
+    
+    def deleteinfile(self, filename:str, line:int) -> None | Error:
+        return self._open('-m', 'd', '-l', str(line), filename)
+    
+    def readinfile(self, filename:str, begin:int=None, end:int=None) -> str | Error:
+        args = list()
+        if begin is not None:
+            args.extend(['-b', str(begin)])
+        if end is not None:
+            args.extend(['-e', end])
+
+        args.append(filename)
+
+        return self._open(*args)
+
+    def getvar(self, varname:str) -> str | Error:
+        return self._var('get', varname)
+    
+    def setvar(self, varname:str, value:str) -> None | Error:
+        return self._var('set', varname, value)
+    
+    def getvarlist(self) -> list[str] | Error:
+        return self._var('list').split('\n')
+
+    def getvardict(self) -> dict[str, str] | Error:
+        ans = self._var('list')
+        if isinstance(ans, Error):
+            return ans
+        else:
+            ans = ans.split('\n')
+            ans = [line.split('=') for line in ans]
+            return dict(ans)
+        
+    def delvar(self, varname:str) -> None | Error:
+        return self._var('del', varname)
+    
+    def move(self, src:str, dest:str) -> None | Error:
+        return self._mv(src, dest)
+    
+    def copy(self, src:str, dest:str) -> None | Error:
+        return self._cp(src, dest)
+    
+    def rename(self, src:str, dest:str) -> None | Error:
+        return self._rename(src, dest)
+    
+    def grep(self, pattern:str, filename:str) -> str | Error:
+        return self._grep(pattern, filename)
+    
+    def cut(self, filename:str, separator:str, fields:str) -> str | Error:
+        return self._cut(filename, separator, fields)
+    
+    def echo(self, *args) -> str | Error:
+        return self._echo(*args)
+
+    def getcwd(self):
+        return self._pwd()
+
+    def output(self, value:str|Error, filename=None, type_: Literal['w','a'] = 'w'):
         if filename is None:
             if value == '':
                 return
@@ -268,7 +385,7 @@ class FS:
         else:
             file: File | Error = self.current.find(filename)
             if isinstance(file, Error):
-                ans = self.touch(filename)
+                ans = self._touch(filename)
                 if isinstance(ans, Error):
                     ans.add_description('On redirect, Invalid filename')
                     print(ans)
@@ -282,3 +399,7 @@ class FS:
                 file.write(value)
             elif type_ == 'a':
                 file.append(value)
+
+    def save(self):
+        with open(self.system_path, 'wb') as f:
+            pickle.dump(self.file_system, f)
