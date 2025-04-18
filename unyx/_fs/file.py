@@ -68,7 +68,11 @@ class File(_FSObject):
             return self.data[start:]
         return self.data[start:end]
 
+
+
     def write(self, content):
+
+        
         self.data = content.split('\\n')
 
     def move(self, target):

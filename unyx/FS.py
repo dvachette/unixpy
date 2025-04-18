@@ -16,8 +16,22 @@ class FS:
         assert isinstance(instance_path, str), 'instance_path must be a string'
         self.running: bool = False
         self.system_path: str = instance_path
-        with open(self.system_path, 'rb') as f:
-            self.file_system: Root = pickle.load(f)
+        try:
+            with open(self.system_path, 'rb') as f:
+                self.file_system: Root = pickle.load(f)
+        except FileNotFoundError:
+            # Create the root directory if the file does not exist
+            self.output(f'File {self.system_path} not found. Creating a new instance file')
+            self.file_system: Root = Root()
+            self.current = self.file_system
+            self._mkdir('tmp')
+        except EOFError:
+            raise Exception("File is empty")
+        except pickle.UnpicklingError:
+            raise Exception("File is corrupted")
+        except Exception as e:
+            raise Exception(f"Unknown error: {e}")
+        
         self.current: _ContainerFSObject = self.file_system
         self.root: Root = self.file_system
         self.log_file_path: str = self.system_path + '.history'

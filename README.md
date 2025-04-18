@@ -13,22 +13,16 @@ you only need python 3.10 +, all the dependencies are available in the standard 
 First you need to import the module's dependencies
 
 ```
-from unyx import starter 
-from unyx import shell
+from unyx import FS
 ```
-Import the starter program (equivalent to the boot menu, it helps you to select on which instance ou want to work)
-
-Import the shell program, which will handle the instance and all the file system
+Import the FS program, which will handle the instance and all the file system
 
 
 ```
-path = starter.start()
-shell.Shell(path).run()
+fs = FS.FS("instancepath")
 ```
+`instancepath` is the path where the instance will be loaded from.
 
-`starter.start()` makes you select an instance and returns its path
-
-`shell.Shell(path).run()` This is the main program, which will launch the shell 
 
 ## The instances
 The unyx instances are stored in .unyx files, whose are just renammed pickle files. As the file system is contained in one single object, it can easily be serialized in a single file.
