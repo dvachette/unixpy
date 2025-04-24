@@ -1,0 +1,13 @@
+/ # ls
+tmp/
+/ # touch test.txt
+
+/ # open -m w -c "test" test.txt
+
+/ # open test.txt
+Error -2: Invalid parameter
+Unknow mode
+/ # open -m r test.txt
+test
+/ # exit
+REPL closed
