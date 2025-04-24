@@ -8,36 +8,28 @@ class File(_FSObject):
     def __init__(self, parent, name):
         self.name = name
         self.parent: _ContainerFSObject = parent
-        self.data:list[str] = list()
+        self._data:bytes = bytes()
         if isinstance(parent, Root):
             self.root = self.parent
         else:
             self.root = self.parent.root
         self.parent.child.append(self)
 
+
+    @property   
+    def data(self):
+        return self._data
+    
+    @data.setter
+    def data(self, value):
+        self._data = value
+
+
     def __repr__(self):
         return f'File({self.parent},{self.name})'
 
     def __str__(self):
         return self.name
-
-    def __getitem__(self, key):
-        return self.data[key]
-
-    def __setitem__(self, key, value):
-        self.data[key] = value
-
-    def __delitem__(self, key):
-        del self.data[key]
-
-    def __iter__(self):
-        return iter(self.data)
-
-    def __len__(self):
-        return len(self.data)
-
-    def __contains__(self, item):
-        return item in self.data
 
     def descend_from(self, item):
         if item == self:
@@ -48,30 +40,33 @@ class File(_FSObject):
 
     def copy(self):
         new = File(self.parent, self.name)
-        new.data = self.data.copy()
+        new.data = self.data
         return new
-
+    
     @property
     def path(self):
         return self.parent.path + self.name
 
     def readf(self, start=0, end=None, lines=False):
+        content = self.data.decode('utf-8')
+        content = content if content else ''
+        content = content.split('\\n')
         if lines:
             if end is None:
-                content = self.data[start:]
-            content = self.data[start:end]
+                content = content[start:]
+            content = content[start:end]
             ans = []
             for i, data in enumerate(content):
                 ans.append(f'{i} {data}')
             return ans
         if end is None:
-            return self.data[start:]
-        return self.data[start:end]
+            return content[start:]
+        return content[start:end]
 
 
 
     def writef(self, content):
-        self.data = content.split('\\n')
+        self.data = bytes(content.encode('utf-8'))
 
     def move(self, target):
         self.parent.child.remove(self)
@@ -145,4 +140,6 @@ class File(_FSObject):
             r'[[:digit:]]', r'\d'
         )
         return re_pattern
+    
+    #   
 

@@ -1,6 +1,3 @@
-from . import open
-
-
 def help_ls():
     return """
     ls [path]
@@ -71,10 +68,22 @@ def help_var():
     get: Get the value of a variable.
     """
 
-
 def help_open():
-    return open.open_.__doc__
+    return """
+    open <path> [-m <mode>] [-b <begin>] [-e <end>] [-l <line>]
+    
+    Open a file at the specified path with the specified mode.
+    
+    Modes:
+    r: read
+    w: write
+    a: append
+    e: edit
+    i: insert
+    d: delete
 
+    Use -b and -e to specify byte range, -l to specify line number.
+    """
 
 def help_():
     return """

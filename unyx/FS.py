@@ -320,6 +320,8 @@ class FS:
         if end is not None:
             args.extend(['-e', end])
         args.append(filename)
+        if mode in 'waei' and content is None:
+            raise ValueError('Content is required for write, append, edit and insert modes')
         return self._open(*tuple(args))
 
     def writeinfile(self, filename:str, content:str) -> None | Error:
