@@ -133,9 +133,9 @@ class Open(Command):
         try:
             match mode:
                 case 'r':
-                    ans = '\n'.join(target.read(begin, end))
+                    ans = '\n'.join(target.readf(begin, end))
                 case 'w':
-                    target.write(content)
+                    target.writef(content)
                 case 'a':
                     target.append(content)
                 case 'e':

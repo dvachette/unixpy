@@ -55,7 +55,7 @@ class File(_FSObject):
     def path(self):
         return self.parent.path + self.name
 
-    def read(self, start=0, end=None, lines=False):
+    def readf(self, start=0, end=None, lines=False):
         if lines:
             if end is None:
                 content = self.data[start:]
@@ -70,9 +70,7 @@ class File(_FSObject):
 
 
 
-    def write(self, content):
-
-        
+    def writef(self, content):
         self.data = content.split('\\n')
 
     def move(self, target):
