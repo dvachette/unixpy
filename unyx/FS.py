@@ -3,10 +3,9 @@ from __future__ import annotations
 from typing import Callable, Literal 
 import pickle
 import re
-from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var, mkdir, echo, cut
+from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var, mkdir, echo, cut, open_
 from ._fs import Directory, File, Root, _ContainerFSObject
 from . import man
-from .open import open_
 from .unyxutils import notImplementedYet
 from .errors import Error
 
@@ -190,7 +189,7 @@ class FS:
         return ans
     
     def _open(self, *args):
-        ans = open_(current=self.current, args=args)
+        ans = open_(self, *args)
         self.save()
         return ans
     

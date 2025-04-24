@@ -1,7 +1,7 @@
 from ._fs import File, _ContainerFSObject
 from .errors import Error
 
-def open_(current, args):
+def open_(shell, *args):
     r"""
     `open -m <mode> -b <begin_line> [[-e <end_line>] [-c <content>]] [-l <line>] <path>`
 
@@ -36,7 +36,7 @@ def open_(current, args):
 
     if len(args) < 1:
         return "Invalid syntax, use 'help open' for more information"
-
+    current = shell.current
     target: File = current.find(args[-1])
 
     if isinstance(target, Error):
