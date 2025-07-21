@@ -157,7 +157,7 @@ class FS:
         return ans
 
     def _cat(self, *args):
-        ans = open_(current=self.current, args=('-m', 'r', args[-1]))
+        ans = open_(self, *('-m', 'r', args[-1]))
         self.save()
         return ans
 

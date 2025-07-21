@@ -11,3 +11,22 @@ Unknow mode
 test
 / # exit
 REPL closed
+/ # ls
+tmp/
+test.txt
+/tmp/ # cd tmp
+
+/tmp/ # ls
+
+/ # cd ..
+
+/tmp/ # cd tmp
+
+/tmp/ # ls -a
+
+/ # cd ..
+
+/ # cat test.txt
+test
+/ # exit
+REPL closed
