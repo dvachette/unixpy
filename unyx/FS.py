@@ -106,9 +106,7 @@ class FS:
             )   # remove empty strings created by multiple spaces
 
             # Manage output redirection
-            filename_output: str | None = (
-                None  # default destination for output redirection
-            )
+            filename_output: str | None = None  # default destination for output redirection
             mode = 'w' # default mode for output redirection
 
             if (

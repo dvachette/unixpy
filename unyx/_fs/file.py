@@ -3,6 +3,7 @@ from .__bases import _FSObject
 from .__bases import _ContainerFSObject
 from ..errors import Error
 from .root import Root
+from ..unyxutils import notDone
 
 class File(_FSObject):
     def __init__(self, parent, name):
@@ -65,23 +66,26 @@ class File(_FSObject):
 
 
 
-    def writef(self, content):
-        self.data = bytes(content.encode('utf-8'))
+    def writef(self, content:bytes):
+        self.data = content
 
     def move(self, target):
         self.parent.child.remove(self)
         self.parent = target
         self.parent.child.append(self)
 
-    def append(self, content):
-        self.data.extend(content.split('\\n'))
+    def append(self, content:bytes):
+        self.data += content
 
+    @notDone
     def insert(self, line, content):
         self.data.insert(line, content)
 
+    @notDone
     def delete(self, line):
         del self.data[line]
 
+    @notDone
     def edit(self, line, content):
         self.data[line] = content
 

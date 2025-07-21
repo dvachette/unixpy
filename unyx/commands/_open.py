@@ -96,35 +96,38 @@ class Open(Command):
                     ind += 1
                 case '-c':
                     try:
-                        content_arg = args[ind + 1]
+                        content_arg:str = args[ind + 1]
                     except IndexError:
                         return 'Missing param after -c'
                     else:
-                        content_arg = content_arg.split(' ')
+                        if not isinstance(content_arg, bytes):
+                            content_arg = content_arg.encode('utf-8')
+                        content_arg = content_arg.split(b' ')
+                        
                         content = list()
                         for elem in content_arg:
-                            if '$' not in elem:
+                            if b'$' not in elem:
                                 content.append(elem)
 
                             else:
-                                if elem[elem.index('$') - 1] == '\\':
-                                    content.append(elem.replace('\\$', '$'))
+                                if elem[elem.index(b'$') - 1] == b'\\':
+                                    content.append(elem.replace(b'\\$', b'$'))
                                 else:
-                                    if elem[elem.index('$') + 1] == '{':
+                                    if elem[elem.index(b'$') + 1] == b'{':
                                         var = elem[
-                                            elem.index('{') + 1 : elem.index('}')
+                                            elem.index(b'{') + 1 : elem.index(b'}')
                                         ]
                                         elem = elem.replace(
-                                            f'${{{var}}}',
-                                            current.root.get_var(var),
+                                            b'${'+ var.encode('utf-8') + b'}',
+                                            current.root.get_var(var).encode('utf-8'),
                                         )
                                     else:
-                                        var = elem[elem.index('$') + 1 :]
+                                        var = elem[elem.index(b'$') + 1 :]
                                         elem = elem.replace(
-                                            f'${var}', current.root.get_var(var)
+                                            b'$' + var.encode('utf-8'), current.root.get_var(var).encode('utf-8') 
                                         )
                                     content.append(elem)
-                        content = ' '.join(content)
+                        content = b' '.join(content)
 
                     ind += 1
                 case _:
