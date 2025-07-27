@@ -2,6 +2,7 @@ import os
 
 from unyx import FS
 
+
 def bootloader():
     images : list[str] = list(filter(lambda s: s.endswith('.unyx'), os.listdir('instances')))
     for i, image in enumerate(images):

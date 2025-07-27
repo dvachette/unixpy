@@ -20,6 +20,7 @@ class Error:
         -5: 'Access error',
         -6: 'Generic error',
         -7: 'User not found',
+        -8: 'No authenticated user',
     }
 
     def __init__(self, code: int):

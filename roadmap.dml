@@ -40,7 +40,19 @@ for : grep [
         ]
     ]
 ]
-
+: users[
+    to : add [
+        commands [
+            login <username> <password> : Login with a username and password;
+            logout : Logout the current user;
+            user add <username> <password> : Add a user;
+            user remove <username> : Remove a user;
+            user list : List all users;
+            user username <username> <new_username> : Change a username;
+            user password <username> <new_password> : Change a password; 
+        ]
+    ]
+]
 : *main* [
     to : add [
         scripts : .un files which can be executed, contains unyx commands;
