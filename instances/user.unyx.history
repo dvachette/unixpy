@@ -1,0 +1,51 @@
+/ # ls
+tmp/
+etc/
+/etc/ # cd etc
+
+/etc/ # ls
+
+/etc/ # ls
+
+/ # cd ..
+
+/ # cd home
+Error -1: File not found
+No such file or directory
+/ # mkdir home
+
+/ # touch home/donat
+Error -2: Invalid parameter
+Invalid file name
+/home/ # cd home
+
+/ # ls
+tmp/
+etc/
+home/
+/ # mkdir home/donat
+
+/ # ls
+tmp/
+etc/
+home/
+/home/ # cd home
+
+/home/ # ls
+donat/
+/home/ # touch donat/.bashrc
+
+/home/ # cd home
+Error -1: File not found
+No such file or directory
+/home/ # cd dont
+Error -1: File not found
+No such file or directory
+/home/donat/ # cd donat
+
+/home/donat/ # ls
+
+/home/donat/ # ls -a
+.bashrc
+/home/donat/ # exit
+REPL closed

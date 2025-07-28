@@ -3,11 +3,15 @@ from __future__ import annotations
 from typing import Callable, Literal 
 import pickle
 import re
+
+from werkzeug.security import generate_password_hash, check_password_hash
+
 from .commands import ls, rm, touch, cd, grep, rename, cp, mv, var, mkdir, echo, cut, open_
 from ._fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .unyxutils import notImplementedYet
 from .errors import Error
+
 
 
 class FS:
@@ -24,6 +28,9 @@ class FS:
             self.file_system: Root = Root()
             self.current = self.file_system
             self._mkdir('tmp')
+            self._mkdir('etc')
+            self._touch('etc/users')
+            self.writeinfile('etc/users', f'root:{generate_password_hash("root")}')  # Create a default user
         except EOFError:
             raise Exception("File is empty")
         except pickle.UnpicklingError:
@@ -31,6 +38,10 @@ class FS:
         except Exception as e:
             raise Exception(f"Unknown error: {e}")
         
+
+        # TODO : Check if the file system is not corrupted
+
+
         self.current: _ContainerFSObject = self.file_system
         self.root: Root = self.file_system
         self.log_file_path: str = self.system_path + '.history'
