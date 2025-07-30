@@ -48,7 +48,7 @@ class File(_FSObject):
     def path(self):
         return self.parent.path + self.name
 
-    def readf(self, start=0, end=None, lines=False):
+    def readf(self, start=0, end=None, lines=False) -> list[str]:
         content = self.data.decode('utf-8')
         content = content if content else ''
         content = content.split('\\n')
@@ -56,7 +56,7 @@ class File(_FSObject):
             if end is None:
                 content = content[start:]
             content = content[start:end]
-            ans = []
+            ans:list[str] = []
             for i, data in enumerate(content):
                 ans.append(f'{i} {data}')
             return ans

@@ -11,7 +11,7 @@ from ._fs import Directory, File, Root, _ContainerFSObject
 from . import man
 from .unyxutils import notImplementedYet
 from .errors import Error
-
+from .user import User
 
 
 class FS:
@@ -30,6 +30,9 @@ class FS:
             self._mkdir('tmp')
             self._mkdir('etc')
             self._touch('etc/users')
+            # The users will be written according to the following pattern : 
+            # username:user_id:hashed_password
+
             self.writeinfile('etc/users', f'root:0:{generate_password_hash("root")}')  # Create a default user
         except EOFError:
             raise Exception("File is empty")
@@ -44,6 +47,9 @@ class FS:
 
         self.current: _ContainerFSObject = self.file_system
         self.root: Root = self.file_system
+
+        self.logged_in_user:User = None
+
         self.log_file_path: str = self.system_path + '.history'
         self.output(f'Welcome to Unyx - {self.system_path}')
         self.alliasses: dict[str : list[str]] = {
@@ -65,6 +71,7 @@ class FS:
             'grep': ['grep'],
             'sudo': ['sudo'],
             'pwd': ['pwd'],
+            'login': ['login', 'auth'],
         }
         self.commands: dict[str : function] = {
             'pwd': self._pwd,
@@ -85,6 +92,7 @@ class FS:
             'sudo': self._sudo,
             'cat': self._cat,
             'exit': self._exit,
+            'login': self._login,
             '': lambda: '',
         }
 
@@ -166,6 +174,13 @@ class FS:
         if not ans:
             ans = ''
         return ans
+
+    def _login(self, *args):
+        user = User.login(*args, self)
+        if isinstance(user, Error):
+            return user
+        self.logged_in_user = user
+        return 'user successfully logged-in'
 
     def _cat(self, *args):
         ans = open_(self, *('-m', 'r', args[-1]))

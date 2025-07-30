@@ -1,15 +1,9 @@
-/ # cd /etc
-Error -1: File not found
-No such file or directory
-/etc/ # cd etc
-
-/etc/ # ls
-users
-/etc/ # cat users
-root:pbkdf2:sha256:260000$IM2UEpZ96iNJLIxu$8cc062368f0549731acb66bb57d3c3bb9e603504f375136da70a5023ee80c101
-/etc/ # exit
+/ # login root root
+user successfully logged-in
+/ # auth root root
+user successfully logged-in
+/ # logout
+Unknow command
+Use "help" to see all available commands
+/ # exit
 REPL closed
-/ # ls /etc
-users
-/ # cat /etc/users
-root:pbkdf2:sha256:260000$IM2UEpZ96iNJLIxu$8cc062368f0549731acb66bb57d3c3bb9e603504f375136da70a5023ee80c101
