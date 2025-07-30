@@ -1,51 +1,15 @@
-/ # ls
-tmp/
-etc/
+/ # cd /etc
+Error -1: File not found
+No such file or directory
 /etc/ # cd etc
 
 /etc/ # ls
-
-/etc/ # ls
-
-/ # cd ..
-
-/ # cd home
-Error -1: File not found
-No such file or directory
-/ # mkdir home
-
-/ # touch home/donat
-Error -2: Invalid parameter
-Invalid file name
-/home/ # cd home
-
-/ # ls
-tmp/
-etc/
-home/
-/ # mkdir home/donat
-
-/ # ls
-tmp/
-etc/
-home/
-/home/ # cd home
-
-/home/ # ls
-donat/
-/home/ # touch donat/.bashrc
-
-/home/ # cd home
-Error -1: File not found
-No such file or directory
-/home/ # cd dont
-Error -1: File not found
-No such file or directory
-/home/donat/ # cd donat
-
-/home/donat/ # ls
-
-/home/donat/ # ls -a
-.bashrc
-/home/donat/ # exit
+users
+/etc/ # cat users
+root:pbkdf2:sha256:260000$IM2UEpZ96iNJLIxu$8cc062368f0549731acb66bb57d3c3bb9e603504f375136da70a5023ee80c101
+/etc/ # exit
 REPL closed
+/ # ls /etc
+users
+/ # cat /etc/users
+root:pbkdf2:sha256:260000$IM2UEpZ96iNJLIxu$8cc062368f0549731acb66bb57d3c3bb9e603504f375136da70a5023ee80c101

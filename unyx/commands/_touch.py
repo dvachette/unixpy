@@ -7,7 +7,10 @@ class Touch(Command):
         super().__init__("touch")
 
     def __call__(self, shell, *args):
-        dest_path, name = args[0].strip().rsplit('/', 1)
+        if '/' in args[0]:
+            dest_path, name = args[0].strip().rsplit('/', 1)
+        else:
+            dest_path, name = '.', args[0].strip()
         dest = shell.current.find(dest_path)
         if isinstance(dest, Error):
             return dest

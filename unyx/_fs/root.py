@@ -84,6 +84,8 @@ class Root(_ContainerFSObject):
         return item == self
 
     def find(self, path):
+        if path.startswith('/'):
+            path = path[1:]
         if '/' in path:
             name, tail = path.split('/', 1)
         else:

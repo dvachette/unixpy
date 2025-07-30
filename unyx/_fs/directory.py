@@ -25,11 +25,7 @@ class Directory(_ContainerFSObject):
         return value.name in names
 
     def descend_from(self, item):
-        if item == self:
-            return True
-        if item == self.root:
-            return True
-        return self.descend_from(item.parent)
+        return item.path in self.path
 
     @property
     def path(self):

@@ -30,7 +30,7 @@ class FS:
             self._mkdir('tmp')
             self._mkdir('etc')
             self._touch('etc/users')
-            self.writeinfile('etc/users', f'root:{generate_password_hash("root")}')  # Create a default user
+            self.writeinfile('etc/users', f'root:0:{generate_password_hash("root")}')  # Create a default user
         except EOFError:
             raise Exception("File is empty")
         except pickle.UnpicklingError:

@@ -101,33 +101,9 @@ class Open(Command):
                         return 'Missing param after -c'
                     else:
                         if not isinstance(content_arg, bytes):
-                            content_arg = content_arg.encode('utf-8')
-                        content_arg = content_arg.split(b' ')
+                            content_arg = content_arg.encode('utf-8')                        
+                        content = content_arg
                         
-                        content = list()
-                        for elem in content_arg:
-                            if b'$' not in elem:
-                                content.append(elem)
-
-                            else:
-                                if elem[elem.index(b'$') - 1] == b'\\':
-                                    content.append(elem.replace(b'\\$', b'$'))
-                                else:
-                                    if elem[elem.index(b'$') + 1] == b'{':
-                                        var = elem[
-                                            elem.index(b'{') + 1 : elem.index(b'}')
-                                        ]
-                                        elem = elem.replace(
-                                            b'${'+ var.encode('utf-8') + b'}',
-                                            current.root.get_var(var).encode('utf-8'),
-                                        )
-                                    else:
-                                        var = elem[elem.index(b'$') + 1 :]
-                                        elem = elem.replace(
-                                            b'$' + var.encode('utf-8'), current.root.get_var(var).encode('utf-8') 
-                                        )
-                                    content.append(elem)
-                        content = b' '.join(content)
 
                     ind += 1
                 case _:
