@@ -7,3 +7,19 @@ Unknow command
 Use "help" to see all available commands
 / # exit
 REPL closed
+/ # whoami
+
+/ # login root root
+user successfully logged-in
+/ # whoami
+root
+/ # login root root
+user successfully logged-in
+/ # whoami
+root
+/ # logout
+
+/ # whoami
+
+/ # exit
+REPL closed

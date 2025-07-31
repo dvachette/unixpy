@@ -72,6 +72,8 @@ class FS:
             'sudo': ['sudo'],
             'pwd': ['pwd'],
             'login': ['login', 'auth'],
+            'whoami': ['whoami'],
+            'logout': ['logout'],
         }
         self.commands: dict[str : function] = {
             'pwd': self._pwd,
@@ -93,6 +95,8 @@ class FS:
             'cat': self._cat,
             'exit': self._exit,
             'login': self._login,
+            'whoami': self._whoami,
+            'logout': self._logout,
             '': lambda: '',
         }
 
@@ -181,6 +185,13 @@ class FS:
             return user
         self.logged_in_user = user
         return 'user successfully logged-in'
+
+    def _logout(self, *args):
+        self.logged_in_user = None
+        return ''
+
+    def _whoami(self, *args):
+        return self.logged_in_user.username if isinstance(self.logged_in_user, User) else ''
 
     def _cat(self, *args):
         ans = open_(self, *('-m', 'r', args[-1]))
